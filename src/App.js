@@ -1,23 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
-
+import Header from "./components/Header";
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./components/HomePage";
+import Events from "./components/Events/Events";
+import Login from "./components/Login/UserLogin";
+import Booking from "./components/Bookings/Booking";
+import UserRegistration from "./components/Registration/UserRegistration";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 function App() {
+
+ 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Header/>
+      <section>
+        <Routes>
+          <Route path="/" element={<HomePage/>} />
+          <Route path="/events" element={<Events/>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/booking/:id" element={<Booking/>} />
+          <Route path="/register" element={<UserRegistration />} />
+        </Routes>
+      </section>
     </div>
   );
 }
