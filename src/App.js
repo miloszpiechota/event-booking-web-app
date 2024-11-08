@@ -5,11 +5,11 @@ import Events from "./components/Events/Events";
 import Login from "./components/Login/UserLogin";
 import Booking from "./components/Bookings/Booking";
 import UserRegistration from "./components/Registration/UserRegistration";
+import ConfirmBooking from "./components/Confirm/ConfirmBooking";
+import Confirmation from "./components/Confirm/Confirmation";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 function App() {
-
- 
   return (
     <div>
       <Header/>
@@ -20,6 +20,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/booking/:id" element={<Booking/>} />
           <Route path="/register" element={<UserRegistration />} />
+          <Route path="/confirm" element={<ConfirmBooking />} />
+          <Route path="/confirmation" element={<Confirmation />} />
         </Routes>
       </section>
     </div>

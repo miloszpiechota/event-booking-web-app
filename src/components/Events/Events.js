@@ -10,8 +10,6 @@ const Events = () => {
         getAllEvents()
         .then((data)=>{
             console.log("data:",data);
-            //tutaj miałeś data.events zamiast data.event
-            
             setEvents(data.event);
             console.log("Fetched events:", data.events);
         })
@@ -53,6 +51,7 @@ const Events = () => {
                     posterUrl={event.photo} 
                     contactInfo={event.contact_info} 
                     status={event.status}
+                    isSeatCategorized={event.is_seat_categorized}
                 />
             ))}
         </Box>

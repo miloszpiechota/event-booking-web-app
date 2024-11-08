@@ -1,19 +1,31 @@
 import { Box, Button, FormLabel, TextField, Typography } from '@mui/material';
-import { getEventDetails, newBooking } from 'api-helpers/api-helpers';
+import { getEventDetails, isSeatCategory } from 'api-helpers/api-helpers';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
+import 'dayjs/locale/pl';
+dayjs.locale('pl');
+var localizedFormat = require("dayjs/plugin/localizedFormat");
+var relativeTime = require("dayjs/plugin/relativeTime");
+dayjs.extend(localizedFormat);
+dayjs.extend(relativeTime);
+
 
 const Booking = () => {
+    const navigate = useNavigate();
     const [inputs, setInputs] = useState({ seatNumber: "", date: "" });
     const [event, setEvent] = useState(null);
-    const { id } = useParams(); // Fetch id from URL
+    const [seatCategoryInfo, setSeatCategoryInfo] = useState("");  
+    const { id } = useParams(); 
 
     useEffect(() => {
         const fetchEvent = async () => {
             try {
                 const data = await getEventDetails(id);
                 if (data && data.event) {
-                    setEvent(data.event); // Save event data to state
+                    setEvent(data.event);
+                    const categoryInfo = await isSeatCategory(data.event.idevent);
+                    setSeatCategoryInfo(categoryInfo); 
                 }
             } catch (error) {
                 console.error("Error fetching event details:", error);
@@ -31,11 +43,19 @@ const Booking = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        newBooking({ ...inputs, event: id })
-            .then((res) => console.log("Booking successful:", res))
-            .catch((err) => console.error("Error creating booking:", err));
-    };
-
+         // Sprawdzamy, czy seatCategoryInfo jest tablicą. Jeśli nie, przekształcamy ją w tablicę.
+        const categoryInfo = Array.isArray(seatCategoryInfo) ? seatCategoryInfo : [seatCategoryInfo];
+        navigate('/confirm', {
+            state: {
+                event: id,
+                seatCategoryInfo: categoryInfo,
+                seatNumber: inputs.seatNumber,
+                date: inputs.date,
+            }
+        });}
+        // newBooking({ ...inputs, event: id })
+        //     .then((res) => console.log("Booking successful:", res))
+        //     .catch((err) => console.error("Error creating booking:", err));
     return (
         <div>
             {event ? (
@@ -59,39 +79,37 @@ const Booking = () => {
                             <Box width="80%" marginTop={3} padding={2}>
                                 <Typography paddingTop={2}>{event.description}</Typography>
                                 <Typography fontWeight="bold" marginTop={1}>
-                                    Start Date: {new Date(event.startDate).toDateString()}
+                                Liczba dostępnych miejsc: {event.number_of_ticket}
                                 </Typography>
                                 <Typography fontWeight="bold" marginTop={1}>
-                                    End Date: {new Date(event.endDate).toDateString()}
+                                Data: {dayjs(event.startDate).format("L")} - {dayjs(event.end_date).format("L")}
                                 </Typography>
-                            </Box>
-                        </Box>
-                        <Box width="50%" paddingTop={3}>
-                            <form onSubmit={handleSubmit}>
+                                <Typography fontWeight="bold" marginTop={1}>
+                                Godzina: {dayjs(event.startDate).format("LT")} - {dayjs(event.end_date).format("LT")}
+                                </Typography>
+                                <Typography fontWeight="bold" marginTop={1}>
+                                 Czas trwania: {dayjs(event.end_date).from(dayjs(event.startDate), true)}
+                                </Typography>
+                                <Typography paddingTop={2}>
+                                Informacje kontaktowe: {event.contact_info}
+                                </Typography>
+                                <Typography paddingTop={2}>
+                                Podział miejsc: {event.is_seat_categorized  ? "Tak" : "Nie"}
+                                </Typography>
+                                    {event.is_seat_categorized && (
+                                        <Typography paddingTop={2}>
+                                            {/* Seat Category Info: {seatCategoryInfo.map(category => `${category.name} - ${category.price} zł`).join(', ')} */}
+                                            Seat Category Info: {seatCategoryInfo}
+                                        </Typography>
+                                    )}
+                                <form onSubmit={handleSubmit}>
                                 <Box padding={5} margin="auto" display="flex" flexDirection="column">
-                                    <FormLabel>Seat Number</FormLabel>
-                                    <TextField
-                                        name="seatNumber"
-                                        value={inputs.seatNumber}
-                                        onChange={handleChange}
-                                        type="number"
-                                        margin="normal"
-                                        variant="standard"
-                                    />
-                                    <FormLabel>Booking Date</FormLabel>
-                                    <TextField
-                                        name="date"
-                                        type="date"
-                                        margin="normal"
-                                        variant="standard"
-                                        value={inputs.date}
-                                        onChange={handleChange}
-                                    />
                                     <Button type="submit" sx={{ mt: 3 }} variant="contained">
-                                        Book Now
+                                        Next (Confirm)
                                     </Button>
                                 </Box>
-                            </form>
+                                </form>
+                            </Box>
                         </Box>
                     </Box>
                 </>
@@ -102,6 +120,8 @@ const Booking = () => {
             )}
         </div>
     );
-};
+    };
+
+
 
 export default Booking;

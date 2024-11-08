@@ -54,6 +54,7 @@ const HomePage = () => {
                     posterUrl={event.photo} 
                     contactInfo={event.contact_info} 
                     status={event.status}
+                    isSeatCategorized={event.is_seat_categorized}
                 />
                 ))}
         </Box>
