@@ -10,10 +10,6 @@ export const getAllEvents = async () => {
          return console.log("No data");
     }
     const data = await res.data;
-    // console.log("getAllEvents");
-    // console.log(data);
-    // console.log("getAllEvents data.event");
-    // console.log(data.event);
     return data;
 };
 
@@ -46,25 +42,7 @@ export const getAllEvents = async () => {
 //   return resData;
 // }
 
-/*
-export const ConfirmBooking = async (data) => {
-    if(isSeatCategory()){}
-    const res = await axios
-        .post("/confirm", {
-        seatNumber: data.seatNumber,
-        date: data.date,
-        event: data.event,
-        user: localStorage.getItem("userId"),
-        })
-        .catch((err) => console.log(err));
-    
-    if (!res || res.status !== 200) {
-        return console.log("Unexpected Error");
-    }
-    const resData = await res.data;
-    return resData;
-}
-*/
+
 
 export const ConfirmBooking = async (data) => {
     try {
@@ -89,50 +67,51 @@ export const ConfirmBooking = async (data) => {
     }
 };
 
+// zmiany zmiany
+
 export const seatCategories = (inputPrice) => [
-    { name: `Pierwsza Kategoria: ${inputPrice * 3.0} zł` },
-    { name: `Druga Kategoria: ${inputPrice * 2.0} zł` },
-    { name: `Trzecia Kategoria: ${inputPrice} zł` },
+    { name: `Pierwsza Kategoria `, price: inputPrice * 3.0 },
+    { name: `Druga Kategoria `, price: inputPrice * 2.0 },
+    { name: `Trzecia Kategoria `, price: inputPrice},
 ];
 
 export const isSeatCategory = async (eventId) => {
-  try {
-      // Pobranie is_seat_categorized z tabeli events
-      const eventRes = await axios.get(`/api/events/read/${eventId}`);
-      
-      if (eventRes.status === 200 && eventRes.data) {
-        const is_seat_categorized = eventRes.data.event.is_seat_categorized;
-          if (is_seat_categorized === false) {
-              return "Brak podziału miejsc.";
-          } else if (is_seat_categorized === true) {
-              // Jeśli podział miejsc jest włączony, pobierz cenę z event_tickets
-              const ticketRes = await axios.get(`/api/event_tickets/read/${eventId}`);
-              
-              
-              if (ticketRes.status === 200 && ticketRes.data) {
-                  const { price } = ticketRes.data;
-                  
-                  if (price) {
-                      const categories = seatCategories(price);
-                      return categories.map(category => category.name).join(', ');
-                  } else {
-                      return "Brak dostępnych biletów.";
-                  }
-              } else {
-                  return "Błąd: Nie można pobrać danych o biletach.";
-              }
-          } else {
-              return "Nieprawidłowa wartość podziału miejsc.";
-          }
-      } else {
-          return "Błąd: Nie można pobrać danych o wydarzeniu.";
-      }
-  } catch (error) {
-      console.error("Błąd podczas pobierania danych:", error);
-      return "Błąd: Nieoczekiwany problem z połączeniem.";
-  }
+    try {
+        // Pobranie is_seat_categorized z tabeli events
+        const eventRes = await axios.get(`/api/events/read/${eventId}`);
+        
+        if (eventRes.status === 200 && eventRes.data) {
+            const is_seat_categorized = eventRes.data.event.is_seat_categorized;
+            
+            if (is_seat_categorized === false) {
+                return "Brak podziału miejsc.";
+            } else if (is_seat_categorized === true) {
+                // Jeśli podział miejsc jest włączony, pobierz cenę z event_tickets
+                const ticketRes = await axios.get(`/api/event_tickets/read/${eventId}`);
+                
+                if (ticketRes.status === 200 && ticketRes.data) {
+                    const { price } = ticketRes.data;
+                    
+                    if (price) {
+                        // Zwraca pełną listę kategorii, zawierającą nazwę i cenę
+                        return seatCategories(price);
+                    } else {
+                        return "Brak dostępnych biletów.";
+                    }
+                } else {
+                    return "Błąd: Nie można pobrać danych o biletach.";
+                }
+            } else {
+                return "Nieprawidłowa wartość podziału miejsc.";
+            }
+        } else {
+            return "Błąd: Nie można pobrać danych o wydarzeniu.";
+        }
+    } catch (error) {
+        console.error("Błąd podczas pobierania danych:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
+    }
 };
-
 
 export const getSeatCategories = async (eventId) => {
     try {
@@ -147,16 +126,15 @@ export const getSeatCategories = async (eventId) => {
             } else {
                 // Krok 2: Jeśli podział miejsc jest włączony, pobierz ceny z event_tickets
                 const ticketRes = await axios.get(`/api/event_tickets/read/${eventId}`);
-                const { price } = ticketRes.data;
-                console.log(price)
-
+                
                 if (ticketRes.status === 200 && ticketRes.data && ticketRes.data.price) {
                     const price = ticketRes.data.price;
                     const categories = seatCategories(price);
                     
-                    // Zwróć listę obiektów zawierających nazwę każdej kategorii
+                    // Zwróć pełną listę kategorii, zawierającą nazwę i cenę
                     return categories.map(category => ({
                         name: category.name,
+                        price: category.price,
                     }));
                 } else {
                     return "Brak dostępnych biletów.";
@@ -171,3 +149,5 @@ export const getSeatCategories = async (eventId) => {
         return [];
     }
 };
+
+

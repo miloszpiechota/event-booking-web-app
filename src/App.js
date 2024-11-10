@@ -7,6 +7,7 @@ import Booking from "./components/Bookings/Booking";
 import UserRegistration from "./components/Registration/UserRegistration";
 import ConfirmBooking from "./components/Confirm/ConfirmBooking";
 import Confirmation from "./components/Confirm/Confirmation";
+//import ConfirmTicket from "./components/Ticket/ConfirmTicket";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 function App() {
@@ -22,6 +23,8 @@ function App() {
           <Route path="/register" element={<UserRegistration />} />
           <Route path="/confirm" element={<ConfirmBooking />} />
           <Route path="/confirmation" element={<Confirmation />} />
+          {/* <Route path="/ticket" element={<ConfirmTicket />} /> */}
+
         </Routes>
       </section>
     </div>
@@ -29,3 +32,4 @@ function App() {
 }
 
 export default App;
+

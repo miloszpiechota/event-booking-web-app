@@ -31,3 +31,4 @@ const EventItem = ({ id, name, startDate, endDate, description, numberOfTickets,
 };
 
 export default EventItem;
+

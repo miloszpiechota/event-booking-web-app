@@ -1,23 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import { Box, Typography, Button, FormControlLabel, Radio, TextField } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, Typography, Button, FormControlLabel, Radio } from '@mui/material';
 import { getSeatCategories } from '../../api-helpers/api-helpers';
 
 const ConfirmBooking = () => {
     const location = useLocation();
-    const { event, seatNumber, date } = location.state || {};
+    const { event, eventName, seatNumber, date, start_date, end_date } = location.state || {};
     const navigate = useNavigate();
     const [seatCategories, setSeatCategories] = useState([]);
-    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const { handleSubmit, control, setValue } = useForm();
 
     useEffect(() => {
         const fetchSeatCategories = async () => {
             if (event) {
-                const categories = await getSeatCategories(event); // Wywołanie funkcji getSeatCategories z eventId
+                const categories = await getSeatCategories(event);
                 if (Array.isArray(categories)) {
-                    setSeatCategories(categories); // Ustawienie pobranych kategorii w stanie
+                    setSeatCategories(categories);
                 } else {
-                    console.error("Nie udało się pobrać kategorii miejsc.");
+                    console.error("Failed to fetch seat categories.");
                 }
             }
         };
@@ -25,22 +27,37 @@ const ConfirmBooking = () => {
     }, [event]);
 
     const handleCategorySelect = (category) => {
-        setSelectedCategories((prevState) => {
-            if (prevState.includes(category)) {
-                return prevState.filter((item) => item !== category);
-            } else {
-                return [...prevState, category];
+        setSelectedCategory(category);
+        setValue("selectedCategory", category);
+    };
+
+    const onSubmit = (data) => {
+        navigate('/confirmation', {
+            state: {
+                selectedCategory,
+                quantity: data.quantity || 1,  // default to 1 if undefined
+                event,
+                eventName,
+                seatNumber,
+                date,
+                start_date,
+                end_date
             }
         });
     };
 
-    const handleConfirm = () => {
+    const handleNonCategorizedBooking = (data) => {
         navigate('/confirmation', {
             state: {
-                selectedCategories,
+                selectedCategory: { name: "Bilet niekategoryzowany", price: null }, // Cena ustawiona na null
+                quantity: data.quantity,
+                price: null, // Cena ustawiona na null lub dowolną domyślną wartość, jeśli jest wymagana
                 event,
+                eventName,
                 seatNumber,
-                date
+                date,
+                start_date,
+                end_date
             }
         });
     };
@@ -50,39 +67,78 @@ const ConfirmBooking = () => {
             <Typography variant="h5" gutterBottom>
                 Wybierz kategorię miejsc:
             </Typography>
-            {Array.isArray(seatCategories) && seatCategories.length > 0 ? (
-                seatCategories.map((category, index) => (
-                    <FormControlLabel
-                        key={index}
-                        control={
-                            <Radio
-                                checked={selectedCategories.includes(category)}
-                                onChange={() => handleCategorySelect(category)}
-                                name={category.name}
-                                color="primary"
+            {seatCategories.length > 0 ? (
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    {seatCategories.map((category, index) => (
+                        <Box key={index} display="flex" flexDirection="column" alignItems="center" marginBottom={2}>
+                            <Controller
+                                name="selectedCategory"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormControlLabel
+                                        control={
+                                            <Radio
+                                                {...field}
+                                                checked={selectedCategory === category}
+                                                onChange={() => handleCategorySelect(category)}
+                                                color="primary"
+                                            />
+                                        }
+                                        label={`${category.name} - Cena: ${category.price} zł`}
+                                    />
+                                )}
                             />
-                        }
-                        label={`${category.name}`}
-                        sx={{
-                            marginTop: 2,
-                            width: '80%',
-                            textAlign: "left"
-                        }}
-                    />
-                ))
+                            {selectedCategory === category && (
+                                <Controller
+                                    name="quantity"
+                                    control={control}
+                                    defaultValue={1}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            label="Ilość"
+                                            type="number"
+                                            inputProps={{ min: 1, max: 10 }}
+                                            sx={{ width: '100px', marginTop: 2 }}
+                                        />
+                                    )}
+                                />
+                            )}
+                        </Box>
+                    ))}
+                    <Button type="submit" variant="contained" sx={{ marginTop: 4, width: '50%' }}>
+                        Zatwierdź
+                    </Button>
+                </form>
             ) : (
-                <Typography>Brak dostępnych kategorii miejsc.</Typography>
+                <form onSubmit={handleSubmit(handleNonCategorizedBooking)}>
+                    <Typography>Brak dostępnych kategorii miejsc.</Typography>
+                    <Controller
+                        name="quantity"
+                        control={control}
+                        defaultValue={1}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                label="Ilość"
+                                type="number"
+                                inputProps={{ min: 1, max: 10 }}
+                                sx={{ width: '100px', marginTop: 2 }}
+                            />
+                        )}
+                    />
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="secondary"
+                        sx={{ marginTop: 4 }}
+                    >
+                        Zarezerwuj bilet niekategoryzowany
+                    </Button>
+                </form>
             )}
-            <Button
-                variant="contained"
-                onClick={handleConfirm}
-                sx={{ marginTop: 4, width: '50%' }}
-            >
-                Zatwierdź
-            </Button>
         </Box>
     );
 };
 
 export default ConfirmBooking;
-
