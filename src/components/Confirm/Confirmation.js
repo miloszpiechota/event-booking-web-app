@@ -1,6 +1,6 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Box, Typography, Button } from '@mui/material';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pl';
 dayjs.locale('pl');
@@ -9,7 +9,34 @@ dayjs.extend(require("dayjs/plugin/relativeTime"));
 
 const Confirmation = () => {
     const location = useLocation();
-    const { selectedCategory, quantity, eventName, seatNumber, date, start_date, end_date, price } = location.state || {};
+    const navigate = useNavigate();
+    const { 
+        selectedCategory, 
+        quantity, 
+        eventName, 
+        seatNumber, 
+        start_date, 
+        end_date, 
+        price, 
+        locationName, 
+        is_seat_categorized 
+    } = location.state || {};
+
+    const handleBuyTicket = () => {
+        navigate('/confirm-ticket', {
+            state: {
+                selectedCategory,
+                quantity,
+                eventName,
+                seatNumber,
+                start_date,
+                end_date,
+                price,
+                locationName,
+                is_seat_categorized
+            }
+        });
+    };
 
     return (
         <Box padding={5}>
@@ -53,7 +80,17 @@ const Confirmation = () => {
                 <Typography>Wydarzenie: {eventName}</Typography>
                 <Typography>Data rozpoczęcia: {dayjs(start_date).format("L")}</Typography>
                 <Typography>Data zakończenia: {dayjs(end_date).format("L")}</Typography>
-                <Typography>Numer Miejsca: {seatNumber}</Typography>
+                <Typography>Lokalizacja: {locationName}</Typography>
+                <Typography>Podział miejsc: {is_seat_categorized ? "Tak" : "Nie"}</Typography>
+                {is_seat_categorized && (
+                    <Typography>Numer Miejsca: {seatNumber}</Typography>
+                )}
+            </Box>
+            {/* Przyciski akcji */}
+            <Box marginTop={5} display="flex" justifyContent="center">
+                <Button variant="contained" color="primary" onClick={handleBuyTicket}>
+                    Kup bilet
+                </Button>
             </Box>
         </Box>
     );

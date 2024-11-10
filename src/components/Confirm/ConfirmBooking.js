@@ -6,7 +6,7 @@ import { getSeatCategories } from '../../api-helpers/api-helpers';
 
 const ConfirmBooking = () => {
     const location = useLocation();
-    const { event, eventName, seatNumber, date, start_date, end_date } = location.state || {};
+    const { event, eventName, seatNumber, date, start_date, end_date, locationName } = location.state || {};
     const navigate = useNavigate();
     const [seatCategories, setSeatCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -35,13 +35,14 @@ const ConfirmBooking = () => {
         navigate('/confirmation', {
             state: {
                 selectedCategory,
-                quantity: data.quantity || 1,  // default to 1 if undefined
+                quantity: data.quantity || 1,  
                 event,
                 eventName,
                 seatNumber,
                 date,
                 start_date,
-                end_date
+                end_date,
+                locationName: locationName 
             }
         });
     };

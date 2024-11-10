@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 export const getAllEvents = async () => {
     const res = await axios
     .get('api/events/read')
@@ -13,7 +12,7 @@ export const getAllEvents = async () => {
     return data;
 };
 
-  export const getEventDetails = async (id) => {
+export const getEventDetails = async (id) => {
     try {
         const response = await axios.get(`/api/events/read/${id}`);  // Correct the URL path
         return response.data;
@@ -22,8 +21,6 @@ export const getAllEvents = async () => {
         throw error;
     }
 };
-
-
 
 // export const newBooking = async(data) => {
 //   const res = await axios
@@ -41,8 +38,6 @@ export const getAllEvents = async () => {
 //   const resData = await res.data;
 //   return resData;
 // }
-
-
 
 export const ConfirmBooking = async (data) => {
     try {
@@ -66,8 +61,6 @@ export const ConfirmBooking = async (data) => {
         console.log("Error in ConfirmBooking:", err);
     }
 };
-
-// zmiany zmiany
 
 export const seatCategories = (inputPrice) => [
     { name: `Pierwsza Kategoria `, price: inputPrice * 3.0 },
@@ -150,4 +143,35 @@ export const getSeatCategories = async (eventId) => {
     }
 };
 
+export const getCategoryNameById = async (categoryId) => {
+    try {
+        const eventRes = await axios.get(`/api/categories/read/${categoryId}`);
+        console.log("Category API response:", eventRes.data);
+        
+        if (eventRes.status === 200 && eventRes.data && eventRes.data.data) {
+            return eventRes.data.data.category_type;  // Pobiera `category_type` z obiektu `data`
+        } else {
+            return "Brak kategorii";
+        }
+    } catch (error) {
+        console.error("Error fetching category name:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
+    }
+};
 
+export const getLocationById = async (locationId) => {
+    try {
+        const locationRes = await axios.get(`/api/locations/read/${locationId}`);
+        
+        if (locationRes.status === 200 && locationRes.data && locationRes.data.data) {
+            const { location_name, city_name, country_name } = locationRes.data.data;
+            console.log("Location API response:", locationRes.data);
+            return `${location_name}, ${city_name}, ${country_name}`;  // Zwracamy pełną lokalizację
+        } else {
+            return "Brak lokalizacji";
+        }
+    } catch (error) {
+        console.error("Error fetching location name:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
+    }
+};
