@@ -1,64 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, FormControlLabel, Radio, TextField } from '@mui/material';
+import { Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Radio, TextField } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getSeatCategories } from '../../api-helpers/api-helpers';
+import { getAllPaymentMethods, getPaymentsMethodsById } from '../../api-helpers/api-helpers';
 
 const ConfirmBooking = () => {
     const location = useLocation();
-    const { event, eventName, seatNumber, date, start_date, end_date, locationName } = location.state || {};
+    const { event, eventName, seatCategoryInfo, seatNumber, date, start_date, end_date, locationName } = location.state || {};
     const navigate = useNavigate();
-    const [seatCategories, setSeatCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [paymentMethods, setPaymentMethods] = useState([]);
+    const [paymentMethodId, setPaymentMethodId] = useState('');
+    const [paymentMethodName, setPaymentMethodName] = useState('');
     const { handleSubmit, control, setValue } = useForm();
 
     useEffect(() => {
-        const fetchSeatCategories = async () => {
-            if (event) {
-                const categories = await getSeatCategories(event);
-                if (Array.isArray(categories)) {
-                    setSeatCategories(categories);
-                } else {
-                    console.error("Failed to fetch seat categories.");
-                }
-            }
+        const fetchPaymentMethods = async () => {
+            const methods = await getAllPaymentMethods();
+            setPaymentMethods(methods);
         };
-        fetchSeatCategories();
-    }, [event]);
+        fetchPaymentMethods();
+    }, []);
 
     const handleCategorySelect = (category) => {
         setSelectedCategory(category);
         setValue("selectedCategory", category);
     };
 
+    const handlePaymentMethodChange = async (methodId) => {
+        setPaymentMethodId(methodId);
+        const methodName = await getPaymentsMethodsById(methodId);
+        setPaymentMethodName(methodName);
+    };
+
     const onSubmit = (data) => {
-        navigate('/confirmation', {
+        navigate('/confirm-ticket', {
             state: {
                 selectedCategory,
-                quantity: data.quantity || 1,  
+                quantity: data.quantity || 1,
                 event,
                 eventName,
                 seatNumber,
                 date,
                 start_date,
                 end_date,
-                locationName: locationName 
-            }
-        });
-    };
-
-    const handleNonCategorizedBooking = (data) => {
-        navigate('/confirmation', {
-            state: {
-                selectedCategory: { name: "Bilet niekategoryzowany", price: null }, // Cena ustawiona na null
-                quantity: data.quantity,
-                price: null, // Cena ustawiona na null lub dowolną domyślną wartość, jeśli jest wymagana
-                event,
-                eventName,
-                seatNumber,
-                date,
-                start_date,
-                end_date
+                locationName,
+                paymentMethodName
             }
         });
     };
@@ -68,9 +55,9 @@ const ConfirmBooking = () => {
             <Typography variant="h5" gutterBottom>
                 Wybierz kategorię miejsc:
             </Typography>
-            {seatCategories.length > 0 ? (
+            {seatCategoryInfo.length > 0 ? (
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    {seatCategories.map((category, index) => (
+                    {seatCategoryInfo.map((category, index) => (
                         <Box key={index} display="flex" flexDirection="column" alignItems="center" marginBottom={2}>
                             <Controller
                                 name="selectedCategory"
@@ -107,36 +94,27 @@ const ConfirmBooking = () => {
                             )}
                         </Box>
                     ))}
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="payment-method-label">Metoda płatności</InputLabel>
+                        <Select
+                            labelId="payment-method-label"
+                            value={paymentMethodId}
+                            onChange={(e) => handlePaymentMethodChange(e.target.value)}
+                            label="Metoda płatności"
+                        >
+                            {paymentMethods.map((method) => (
+                                <MenuItem key={method.idpayment_method} value={method.idpayment_method}>
+                                    {method.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <Button type="submit" variant="contained" sx={{ marginTop: 4, width: '50%' }}>
                         Zatwierdź
                     </Button>
                 </form>
             ) : (
-                <form onSubmit={handleSubmit(handleNonCategorizedBooking)}>
-                    <Typography>Brak dostępnych kategorii miejsc.</Typography>
-                    <Controller
-                        name="quantity"
-                        control={control}
-                        defaultValue={1}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                label="Ilość"
-                                type="number"
-                                inputProps={{ min: 1, max: 10 }}
-                                sx={{ width: '100px', marginTop: 2 }}
-                            />
-                        )}
-                    />
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="secondary"
-                        sx={{ marginTop: 4 }}
-                    >
-                        Zarezerwuj bilet niekategoryzowany
-                    </Button>
-                </form>
+                <Typography>Brak dostępnych kategorii miejsc.</Typography>
             )}
         </Box>
     );

@@ -50,8 +50,8 @@ const Events = () => {
                     numberOfTickets={event.number_of_ticket} 
                     posterUrl={event.photo} 
                     contactInfo={event.contact_info} 
-                    status={event.status}
                     isSeatCategorized={event.is_seat_categorized}
+                    idstatus_type={event.idstatus_type}
                 />
             ))}
         </Box>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardActions, Typography, Button, CardMedia, CardActionArea } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const EventItem = ({ id, name, startDate, endDate, description, numberOfTickets, posterUrl, contactInfo, status, isSeatCategorized }) => {
+const EventItem = ({ id, name, startDate, endDate, description, numberOfTickets, posterUrl, contactInfo, isSeatCategorized, idstatus_type }) => {
   return (
       <Card sx={{ maxWidth: 345, margin: 2, ":hover": { boxShadow: "10px 10px 20px #ccc" } }}>
           <CardActionArea>

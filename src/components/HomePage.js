@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { Link } from "react-router-dom";
@@ -53,7 +54,7 @@ const HomePage = () => {
                     numberOfTickets={event.number_of_ticket} 
                     posterUrl={event.photo} 
                     contactInfo={event.contact_info} 
-                    status={event.status}
+                    idstatus_type={event.idstatus_type}
                     isSeatCategorized={event.is_seat_categorized}
                 />
                 ))}

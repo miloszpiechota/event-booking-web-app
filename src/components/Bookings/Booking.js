@@ -1,6 +1,6 @@
 
 import { Box, Button, Typography, TextField } from '@mui/material';
-import { getEventDetails, getCategoryNameById, getLocationById, isSeatCategory} from 'api-helpers/api-helpers';
+import { getEventDetails, getCategoryNameById, getLocationById, isSeatCategory, getStatusById, getPrice} from 'api-helpers/api-helpers';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
@@ -26,6 +26,7 @@ const Booking = () => {
     const [seatCategoryInfo, setSeatCategoryInfo] = useState([]);
     const [categoryName, setCategoryName] = useState("Ładowanie kategorii...");
     const [locationName, setLocationName] = useState("Ładowanie lokalizacji...");
+    const [statusName, setStatusName] = useState("Ładowanie statusu...");
     const { handleSubmit, control } = useForm({
         defaultValues: {
             seatNumber: "",
@@ -38,14 +39,23 @@ const Booking = () => {
                 const data = await getEventDetails(id);
                 if (data && data.event) {
                     setEvent(data.event);
-                    const categoryInfo = await isSeatCategory(data.event.idevent);
-                    setSeatCategoryInfo(Array.isArray(categoryInfo) ? categoryInfo : [categoryInfo]);
+                    // const categoryInfo = await isSeatCategory(data.event.idevent);
+                    // setSeatCategoryInfo(Array.isArray(categoryInfo) ? categoryInfo : [categoryInfo]);
+                    const priceInfo = await getPrice(data.event.idevent);
+                    setSeatCategoryInfo(Array.isArray(priceInfo) ? priceInfo : [priceInfo]);
+
+
                     const fetchedCategoryName = await getCategoryNameById(data.event.idevent_category);
                     setCategoryName(fetchedCategoryName || "Brak kategorii");
+
                     console.log("Fetched category name:", fetchedCategoryName);                
                     const fetchedLocationName = await getLocationById(data.event.idevent_location); 
+
                     setLocationName(fetchedLocationName || "Brak lokalizacji");
                     console.log("Fetched location name:", fetchedLocationName);
+
+                    const fetchedStatusName = await getStatusById(data.event.idstatus_type);
+                    setStatusName(fetchedStatusName || "Brak statusu"); 
                 }
             } catch (error) {
                 console.error("Error fetching event details:", error);
@@ -110,8 +120,11 @@ const Booking = () => {
                                 <Typography paddingTop={2}>
                                     Lokalizacja: {locationName}
                                 </Typography>
+                                <Typography paddingTop={2}>
+                                    Status: {statusName} {/* Wyświetl status */}
+                                </Typography>
 
-                                {event.is_seat_categorized && (
+                                {/* {event.is_seat_categorized && (
                                     <Box paddingTop={2}>
                                         <Typography fontWeight="bold">Seat Category Info:</Typography>
                                         {seatCategoryInfo.map((category, index) => (
@@ -120,7 +133,20 @@ const Booking = () => {
                                             </Typography>
                                         ))}
                                     </Box>
-                                )}
+                                )} */}
+
+                                    <Box paddingTop={2}>
+                                    <Typography fontWeight="bold">Seat Category Info:</Typography>
+                                    {seatCategoryInfo.length > 0 ? (
+                                        seatCategoryInfo.map((category, index) => (
+                                            <Typography key={index}>
+                                                {category.name} - Cena: {category.price} zł
+                                            </Typography>
+                                        ))
+                                    ) : (
+                                        <Typography>Brak dostępnych biletów.</Typography>
+                                    )}
+                                </Box>
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <Box padding={5} margin="auto" display="flex" flexDirection="column">
                                         <Button type="submit" sx={{ mt: 3 }} variant="contained">
