@@ -22,7 +22,6 @@ export const getEventDetails = async (id) => {
     }
 };
 
-// api-helpers.js
 export const generateTicketData = (ticketData) => {
     try {
         return JSON.stringify(ticketData, null, 2); // Zwraca obiekt sformatowany w JSON
@@ -122,46 +121,6 @@ export const isSeatCategory = async (eventId) => {
         return false;
     }
 };
-
-
-
-// export const isSeatCategory = async (eventId) => {
-//     try {
-//         // Pobranie is_seat_categorized z tabeli events
-//         const eventRes = await axios.get(`/api/events/read/${eventId}`);
-        
-//         if (eventRes.status === 200 && eventRes.data) {
-//             const is_seat_categorized = eventRes.data.event.is_seat_categorized;
-            
-//             if (is_seat_categorized === false) {
-//                 return "Brak podziału miejsc.";
-//             } else if (is_seat_categorized === true) {
-//                 // Jeśli podział miejsc jest włączony, pobierz cenę z event_tickets
-//                 const ticketRes = await axios.get(`/api/event_tickets/read/${eventId}`);
-                
-//                 if (ticketRes.status === 200 && ticketRes.data) {
-//                     const { price } = ticketRes.data;
-                    
-//                     if (price) {
-//                         // Zwraca pełną listę kategorii, zawierającą nazwę i cenę
-//                         return seatCategories(price);
-//                     } else {
-//                         return "Brak dostępnych biletów.";
-//                     }
-//                 } else {
-//                     return "Błąd: Nie można pobrać danych o biletach.";
-//                 }
-//             } else {
-//                 return "Nieprawidłowa wartość podziału miejsc.";
-//             }
-//         } else {
-//             return "Błąd: Nie można pobrać danych o wydarzeniu.";
-//         }
-//     } catch (error) {
-//         console.error("Błąd podczas pobierania danych:", error);
-//         return "Błąd: Nieoczekiwany problem z połączeniem.";
-//     }
-// };
 
 export const getSeatCategories = async (eventId) => {
     try {
@@ -268,3 +227,31 @@ export const getStatusById = async (statusId) => {
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 }
+
+export const fetchEventCoordinates = async (locationName) => {
+    try {
+        const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+            params: {
+                q: locationName,       // Zapytanie (nazwa lub adres lokalizacji)
+                format: 'json',        // Format odpowiedzi
+                addressdetails: 1,     // Dodanie szczegółów adresu
+                limit: 1               // Pobranie pierwszego wyniku
+            }
+        });
+
+        // Sprawdź, czy odpowiedź zawiera dane o współrzędnych
+        if (response.data && response.data.length > 0) {
+            const { lat, lon } = response.data[0];
+            return {
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lon)
+            };
+        } else {
+            console.error("Nie znaleziono współrzędnych dla lokalizacji:", locationName);
+            return null;
+        }
+    } catch (error) {
+        console.error("Błąd podczas wczytywania współrzędnych lokalizacji:", error);
+        return null;
+    }
+};

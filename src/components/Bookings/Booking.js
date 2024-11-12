@@ -1,14 +1,39 @@
 
 import { Box, Button, Typography, TextField } from '@mui/material';
-import { getEventDetails, getCategoryNameById, getLocationById, isSeatCategory, getStatusById, getPrice} from 'api-helpers/api-helpers';
+import { getEventDetails, getCategoryNameById, getLocationById, isSeatCategory, getStatusById, getPrice, fetchEventCoordinates} from 'api-helpers/api-helpers';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pl';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 dayjs.locale('pl');
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
 dayjs.extend(require("dayjs/plugin/relativeTime"));
+
+// Ustawienie ikony jako domyślnej dla markerów
+const DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Komponent do aktualizacji widoku mapy na nowe współrzędne
+const MapCenterUpdater = ({ coordinates }) => {
+    const map = useMap();
+    useEffect(() => {
+        if (coordinates) {
+            map.setView([coordinates.latitude, coordinates.longitude], 13);
+        }
+    }, [coordinates, map]);
+    return null;
+};
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -27,6 +52,7 @@ const Booking = () => {
     const [categoryName, setCategoryName] = useState("Ładowanie kategorii...");
     const [locationName, setLocationName] = useState("Ładowanie lokalizacji...");
     const [statusName, setStatusName] = useState("Ładowanie statusu...");
+    const [coordinates, setCoordinates] = useState(null);
     const { handleSubmit, control } = useForm({
         defaultValues: {
             seatNumber: "",
@@ -39,11 +65,9 @@ const Booking = () => {
                 const data = await getEventDetails(id);
                 if (data && data.event) {
                     setEvent(data.event);
-                    // const categoryInfo = await isSeatCategory(data.event.idevent);
-                    // setSeatCategoryInfo(Array.isArray(categoryInfo) ? categoryInfo : [categoryInfo]);
+
                     const priceInfo = await getPrice(data.event.idevent);
                     setSeatCategoryInfo(Array.isArray(priceInfo) ? priceInfo : [priceInfo]);
-
 
                     const fetchedCategoryName = await getCategoryNameById(data.event.idevent_category);
                     setCategoryName(fetchedCategoryName || "Brak kategorii");
@@ -55,7 +79,20 @@ const Booking = () => {
                     console.log("Fetched location name:", fetchedLocationName);
 
                     const fetchedStatusName = await getStatusById(data.event.idstatus_type);
-                    setStatusName(fetchedStatusName || "Brak statusu"); 
+                    setStatusName(fetchedStatusName || "Brak statusu");
+
+
+
+                    if (fetchedLocationName) {
+                        const coords = await fetchEventCoordinates(fetchedLocationName);
+                        if (coords) {
+                            setCoordinates(coords);
+                        } else {
+                            console.warn("Brak współrzędnych dla podanej lokalizacji.");
+                        }
+                    } else {
+                        console.error("Nie ustawiono poprawnie `locationName` dla biletów niekategoryzowanych.");
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching event details:", error);
@@ -121,21 +158,10 @@ const Booking = () => {
                                     Lokalizacja: {locationName}
                                 </Typography>
                                 <Typography paddingTop={2}>
-                                    Status: {statusName} {/* Wyświetl status */}
+                                    Status: {statusName}
                                 </Typography>
 
-                                {/* {event.is_seat_categorized && (
-                                    <Box paddingTop={2}>
-                                        <Typography fontWeight="bold">Seat Category Info:</Typography>
-                                        {seatCategoryInfo.map((category, index) => (
-                                            <Typography key={index}>
-                                                {category.name} - Cena: {category.price} zł
-                                            </Typography>
-                                        ))}
-                                    </Box>
-                                )} */}
-
-                                    <Box paddingTop={2}>
+                                <Box paddingTop={2}>
                                     <Typography fontWeight="bold">Seat Category Info:</Typography>
                                     {seatCategoryInfo.length > 0 ? (
                                         seatCategoryInfo.map((category, index) => (
@@ -147,6 +173,27 @@ const Booking = () => {
                                         <Typography>Brak dostępnych biletów.</Typography>
                                     )}
                                 </Box>
+
+                                <Box marginTop={4}>
+                                    <Typography variant="h6" gutterBottom>Mapa lokalizacji wydarzenia:</Typography>
+                                    {coordinates ? (
+                                        <MapContainer center={[coordinates.latitude, coordinates.longitude]} zoom={13} style={{ height: "300px", width: "100%" }}>
+                                            <TileLayer
+                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            />
+                                            <Marker position={[coordinates.latitude, coordinates.longitude]}>
+                                                <Popup>
+                                                    {event.name} - {locationName}
+                                                </Popup>
+                                            </Marker>
+                                            <MapCenterUpdater coordinates={coordinates} />
+                                        </MapContainer>
+                                    ) : (
+                                        <Typography>Ładowanie lokalizacji wydarzenia...</Typography>
+                                    )}
+                                </Box>
+
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <Box padding={5} margin="auto" display="flex" flexDirection="column">
                                         <Button type="submit" sx={{ mt: 3 }} variant="contained">

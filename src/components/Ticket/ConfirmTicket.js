@@ -1,15 +1,39 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
-import QRCode from 'qrcode.react';
 import { QRCodeCanvas } from 'qrcode.react';
-
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import dayjs from 'dayjs';
 import html2pdf from 'html2pdf.js';
-import { generateTicketData } from '../../api-helpers/api-helpers';
+import { generateTicketData, fetchEventCoordinates } from '../../api-helpers/api-helpers';
+import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 dayjs.locale('pl');
 dayjs.extend(require("dayjs/plugin/localizedFormat"));
+
+// Ustawienie ikony jako domyślnej dla markerów
+const DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Komponent do aktualizacji widoku mapy na nowe współrzędne
+const MapCenterUpdater = ({ coordinates }) => {
+    const map = useMap();
+    useEffect(() => {
+        if (coordinates) {
+            map.setView([coordinates.latitude, coordinates.longitude], 13);
+        }
+    }, [coordinates, map]);
+    return null;
+};
 
 const ConfirmTicket = () => {
     const location = useLocation();
@@ -23,10 +47,29 @@ const ConfirmTicket = () => {
         locationName,
         is_seat_categorized,
         seatNumber,
-        paymentMethodName
+        paymentMethodName,
     } = location.state || {};
 
-    // Dynamiczne generowanie obiektu biletu
+    const [coordinates, setCoordinates] = useState(null); // Ustawienie jako null na start
+
+    useEffect(() => {
+        const loadCoordinates = async () => {
+            if (locationName) {
+                try {
+                    const coords = await fetchEventCoordinates(locationName);
+                    if (coords) {
+                        setCoordinates(coords);
+                    } else {
+                        console.error("Brak współrzędnych dla podanej lokalizacji.");
+                    }
+                } catch (error) {
+                    console.error("Błąd podczas pobierania współrzędnych:", error);
+                }
+            }
+        };
+        loadCoordinates();
+    }, [locationName]);
+
     const ticketData = {
         eventName,
         startDate: start_date,
@@ -94,10 +137,27 @@ const ConfirmTicket = () => {
                 </Box>
                 <Box textAlign="center" marginTop={3}>
                     <QRCodeCanvas id="qrcode" value={qrCodeData} size={150} />
-
                 </Box>
+                <Box marginTop={4}>
+                <Typography variant="h6" gutterBottom>Mapa lokalizacji wydarzenia:</Typography>
+                {coordinates ? (
+                    <MapContainer center={[coordinates.latitude, coordinates.longitude]} zoom={13} style={{ height: "300px", width: "100%" }}>
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                        <Marker position={[coordinates.latitude, coordinates.longitude]}>
+                            <Popup>
+                                {eventName} - {locationName}
+                            </Popup>
+                        </Marker>
+                        <MapCenterUpdater coordinates={coordinates} />
+                    </MapContainer>
+                ) : (
+                    <Typography>Ładowanie lokalizacji wydarzenia...</Typography>
+                )}
             </Box>
-
+            </Box>
             <Box display="flex" justifyContent="center" gap={2} marginTop={4}>
                 <Button variant="contained" color="primary" onClick={handleDownloadPDF}>
                     Pobierz PDF

@@ -42,7 +42,7 @@ const HomePage = () => {
         >
             {events && 
                 events
-                .slice(0, 4)
+                .slice(0, 8)
                 .map((event,index) => (
                 <EventItem 
                     key={index} 
