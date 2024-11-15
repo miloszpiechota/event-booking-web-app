@@ -12,6 +12,25 @@ export const getAllEvents = async () => {
     return data;
 };
 
+
+export const searchEvents = async (query) => {
+    try {
+        const res = await axios.get('/api/events/search', {
+            params: { name: query }
+        });
+        
+        // Sprawdzamy, czy odpowiedź zakończyła się powodzeniem
+        if (res.status === 200 && res.data.success) {
+            return res.data.event; // Zwracamy znalezione wydarzenia
+        } else {
+            console.error("Search failed:", res.data.msg);
+            return [];
+        }
+    } catch (error) {
+        console.error("Error searching events:", error);
+        return [];
+    }
+};
 export const getEventDetails = async (id) => {
     try {
         const response = await axios.get(`/api/events/read/${id}`);  // Correct the URL path
@@ -255,3 +274,4 @@ export const fetchEventCoordinates = async (locationName) => {
         return null;
     }
 };
+
