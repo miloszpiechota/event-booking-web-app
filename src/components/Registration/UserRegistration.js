@@ -42,7 +42,9 @@ const UserRegistration = () => {
   // const [isCitiesLoaded, setIsCitiesLoaded] = useState(false); // Track if cities are loaded
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/cities/read")
+    fetch(
+      "https://inzynierka-event-app-backend.azurewebsites.net/api/cities/read"
+    )
       .then((response) => response.json())
       .then((data) => {
         setCities(data); // Just populate cities
@@ -61,7 +63,7 @@ const UserRegistration = () => {
     };
 
     // Send data to backend to create the user
-    fetch("http://localhost:3000/api/users/create", {
+    fetch("https://inzynierka-event-app-backend.azurewebsites.net/api/users/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

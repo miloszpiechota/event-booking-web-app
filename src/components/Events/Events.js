@@ -20,9 +20,10 @@ const Events = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
+                console.log("asking");
                 const data = await getAllEvents();
                 setEvents(data.event);
-                console.log("Fetched events:", data.events);
+                console.log("Fetched events:", data.event);
             } catch (err) {
                 console.log(err);
             }

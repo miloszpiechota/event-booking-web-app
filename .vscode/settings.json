@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/36a681ee-8fe6-4219-925a-1f1793c1818e/resourceGroups/inżynierka/providers/Microsoft.Web/sites/inzynierka-event-web-app",
+  "appService.deploySubpath": "build"
+}

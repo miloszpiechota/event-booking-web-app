@@ -8,8 +8,7 @@ import UserRegistration from "./components/Registration/UserRegistration";
 import ConfirmBooking from "./components/Confirm/ConfirmBooking";
 import Confirmation from "./components/Confirm/Confirmation";
 import ConfirmTicket from "./components/Ticket/ConfirmTicket";
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
 function App() {
   return (
     <div>

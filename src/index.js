@@ -8,16 +8,16 @@ import {Provider} from 'react-redux';
 import { store } from "./store/index.js";
 import axios from 'axios';
 const root = ReactDOM.createRoot(document.getElementById('root'));
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = 'https://inzynierka-event-app-backend.azurewebsites.net/';
 
 root.render(
-  <React.StrictMode>
+ 
     <BrowserRouter>
       <Provider store={store}>
         <App />
       </Provider>
     </BrowserRouter>
-  </React.StrictMode>
+ 
 );
 
 

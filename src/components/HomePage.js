@@ -79,7 +79,7 @@
 import React, { useEffect, useState } from 'react';
 import Slider from "react-slick";
 import { Box, Typography, Button } from '@mui/material';
-import ArrowCircleLeftRoundedIcon from '@mui/icons-material/ArrowCircleLeftRounded';
+// import ArrowCircleLeftRoundedIcon from '@mui/icons-material/ArrowCircleLeftRounded';
 import { Link } from "react-router-dom";
 import EventItem from './Events/EventItem';
 import { getAllEvents } from '../api-helpers/api-helpers.js';

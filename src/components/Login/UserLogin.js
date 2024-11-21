@@ -3,58 +3,80 @@ import { useForm, Controller } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TextField, Button } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
+import { handleLogin } from "../../api-helpers/api-helpers";
+import axios from "axios";
 // Define the schema for form validation
 const schema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  password: Yup.string()
+    .min(1, "Password must be at least 1 characters")
+    .required("Password is required"),
 });
 
 const UserLogin = () => {
+  const [loginError, setLoginError] = useState(null); // Stan do przechowywania błędu logowania
+  const [email, setEmailValue] = useState("");
+  const [password, setPasswordValue] = useState("");
+
+  const navigate = useNavigate();
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      email: '', // Początkowa wartość dla email
+      password: '', // Początkowa wartość dla password
+    }
   });
 
-  const [loginError, setLoginError] = useState(""); // To store login errors if any
+  if (sessionStorage["token"] != null) {
+    //jeżeli użytkownik jest zalogowany, przekieruj do strony głównej
+    navigate("/");
+  }
 
-  const onSubmit = (data) => {
-    // Make a request to your backend to authenticate the user
-    const loginData = {
-      email: data.email,
-      password: data.password,
-    };
+  const onSubmit = async (data) => {
+    try {
+      //wyślij zapytanie do modułu obsługi logowania i odbierz token
+      const { token, success } = await handleLogin(data.email, data.password);
 
-    // Example API call to authenticate
-    fetch("http://localhost:3000/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.success) {
-          alert("Login successful!");
-          // Perform any additional logic such as redirecting or storing auth token
-        } else {
-          setLoginError(result.msg || "Login failed, please check your credentials.");
-        }
-      })
-      .catch((error) => {
-        setLoginError("Error: " + error.message);
-      });
+      //dodaj token do sessionStorage i przekierój do strony głównej
+      if (success && token) {
+        sessionStorage.setItem("token", token);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("error: ", error.message);
+    }
   };
-
+  //funkcja do przechwytywania odpowiedzi i błędów przez axios
+  axios.interceptors.response.use(
+    //dla kodów 200 przekazuje dalej
+    (response) => response,
+    async (error) => {
+      //sprawdza czy kody błędów zostały zdefiniowane i je obsługuje
+      if (error.response && error.response.status === 401) {
+        if (error.response.data.msg === "Email not found!") {
+          setLoginError("Nie znaleziono podanego adresu email!");
+        } else if (error.response.data.msg === "Incorrect password!") {
+          setLoginError("Błędne hasło!");
+        }
+      }
+      
+    }
+  );
   return (
     <div>
       <h2>User Login</h2>
-      {loginError && <div style={{ color: "red" }}>{loginError}</div>} {/* Display login error */}
-
+      {loginError && (
+        <div className="alert alert-danger" role="alert">
+          {loginError}
+        </div>
+      )}{" "}
+      {/* Display login error */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           control={control}
@@ -95,7 +117,6 @@ const UserLogin = () => {
 };
 
 export default UserLogin;
-
 
 ////////////////////////////////////////////////////////////////
 
@@ -244,4 +265,3 @@ export default UserLogin;
 // };
 
 // export default UserLogin;
-

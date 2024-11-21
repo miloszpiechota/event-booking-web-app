@@ -68,18 +68,16 @@
 
 // export default EventItem;
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardActions, Typography, Button, CardMedia, IconButton, CardHeader } from '@mui/material';
 import { Link } from 'react-router-dom';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import dayjs from 'dayjs';
-import { getEventDetails, getCategoryNameById, getLocationById, isSeatCategory, getStatusById, getPrice, fetchEventCoordinates} from 'api-helpers/api-helpers';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -110,9 +108,8 @@ const EventItem = ({ id, name, startDate, endDate, description, posterUrl, locat
         const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         return favorites.includes(id);
     });
-    const [event, setEvent] = useState(null);
     const [expanded, setExpanded] = useState(false);
-    const [fetchedLocationName, setFetchedLocationName] = useState("Ładowanie lokalizacji...");
+    const [fetchedLocationName] = useState("Ładowanie lokalizacji...");
     const toggleFavorite = () => {
         setIsFavorite((prev) => {
             const updatedFavoriteStatus = !prev;
