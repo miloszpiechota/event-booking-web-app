@@ -1,19 +1,24 @@
-import { Box, Typography } from "@mui/material";
-
+import { Box, Typography, TextField, IconButton,  List,
+    ListItem,
+    ListItemText, } from "@mui/material";
 import Textarea from "@mui/joy/Textarea";
 import Button from "@mui/joy/Button";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Add from '@mui/icons-material/Add';
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import {
   getEventDetails,
   getCategoryNameById,
   getLocationById,
+  isSeatCategory,
   getStatusById,
   getPrice,
   fetchEventCoordinates,
+  addComment, getCommentsByEvent,
 } from "api-helpers/api-helpers";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import "dayjs/locale/pl";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
@@ -66,13 +71,53 @@ const Booking = () => {
   const [locationName, setLocationName] = useState("Ładowanie lokalizacji...");
   const [statusName, setStatusName] = useState("Ładowanie statusu...");
   const [coordinates, setCoordinates] = useState(null);
-  const { handleSubmit } = useForm({
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [isFavorite, setIsFavorite] = useState(() => {
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    return favorites.includes(id);
+  });
+
+  const toggleFavorite = () => {
+    setIsFavorite((prev) => {
+      const updatedFavoriteStatus = !prev;
+      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      const updatedFavorites = updatedFavoriteStatus
+        ? [...favorites, id]
+        : favorites.filter((eventId) => eventId !== id);
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      return updatedFavoriteStatus;
+    });
+  };
+
+  const { handleSubmit, control } = useForm({
     defaultValues: {
       seatNumber: "",
     },
   });
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return; // Nie pozwalaj na dodawanie pustych komentarzy
+
+    const commentData = {
+        comment: newComment,
+        iduser: parseInt(localStorage.getItem("userId")), // Pobierz ID użytkownika z localStorage
+        idevent: parseInt(id),
+        date_comment: new Date(),
+      };
+
+    const addedComment = await addComment(commentData); // Używa ID użytkownika 1 jako przykład
+    if (addedComment) {
+      setComments((prev) => [...prev, addedComment]);
+      setNewComment("");
+    }
+  };
 
   useEffect(() => {
+    const fetchComments = async () => {
+        const fetchedComments = await getCommentsByEvent(parseInt(id));
+        setComments(fetchedComments);
+      };
+
     const fetchEvent = async () => {
       try {
         const data = await getEventDetails(id);
@@ -119,30 +164,27 @@ const Booking = () => {
         console.error("Error fetching event details:", error);
       }
     };
+    fetchComments();
     fetchEvent();
-  }, [id]);
+  }, []);
 
   const onSubmit = (data) => {
-    if (!sessionStorage["token"]) {
-      navigate("login");
-    } else {
-      navigate("/confirm", {
-        state: {
-          event: id,
-          eventName: event.name,
-          seatCategoryInfo,
-          seatNumber: data.seatNumber,
-          date: data.date,
-          start_date: event.start_date,
-          end_date: event.end_date,
-          numberOfTickets: data.number_of_ticket,
-          category: data.category,
-          locationName: locationName,
-          is_seat_categorized: event.is_seat_categorized,
-          eventDescription: event.description,
-        },
-      });
-    }
+    navigate("/confirm", {
+      state: {
+        event: id,
+        eventName: event.name,
+        seatCategoryInfo,
+        seatNumber: data.seatNumber,
+        date: data.date,
+        start_date: event.start_date,
+        end_date: event.end_date,
+        numberOfTickets: data.number_of_ticket,
+        category: data.category,
+        locationName: locationName,
+        is_seat_categorized: event.is_seat_categorized,
+        eventDescription: event.description,
+      },
+    });
   };
 
   return (
@@ -158,6 +200,13 @@ const Booking = () => {
           <Typography variant="h4" gutterBottom textAlign="center">
             {event.name}
           </Typography>
+          <IconButton
+            onClick={toggleFavorite}
+            sx={{ color: isFavorite ? "red" : "grey" }}
+            aria-label="add to favorites"
+          >
+            <FavoriteIcon />
+          </IconButton>
 
           <Box
             marginTop={3}
@@ -265,21 +314,44 @@ const Booking = () => {
               )}
             </Box>
           </Box>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-            }}
-          >
-            <Textarea
-              placeholder="Napisz coś o wydarzeniu"
-              required
-              sx={{ mb: 1 }}
-              size="lg"
-              color="success"
-            />
-            <Button type="submit">Dodaj komentarz</Button>
-          </form>
-          <Box display="flex" justifyContent="center" marginTop={3}>
+      {/* Wyświetlanie komentarzy */}
+      <Box marginTop={5}>
+        <Typography variant="h6">Komentarze:</Typography>
+        <List>
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <ListItem key={comment.idcomment}>
+                <ListItemText
+                  primary={comment.comment}
+                  secondary={new Date(comment.date_comment).toLocaleString()}
+                />
+              </ListItem>
+            ))
+          ) : (
+            <Typography>Brak komentarzy.</Typography>
+          )}
+        </List>
+      </Box>
+
+      {/* Dodawanie komentarza */}
+      <Box marginTop={3}>
+        <TextField
+          label="Dodaj komentarz"
+          fullWidth
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          multiline
+        />
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <Button
+          onClick={handleAddComment}
+          startDecorator={<Add />}
+        >
+          Dodaj komentarz
+        </Button>
+        </Box>
+      </Box>
+          <Box display="flex" justifyContent="center" marginTop={3} >
             <Button
               endDecorator={<KeyboardArrowRight />}
               color="success"

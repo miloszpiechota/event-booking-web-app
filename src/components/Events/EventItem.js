@@ -103,7 +103,7 @@ const ExpandMore = styled((props) => {
     }),
 }));
 
-const EventItem = ({ id, name, startDate, endDate, description, posterUrl, locationName, isSeatCategorized, numberOfTickets, contactInfo, idstatus_type }) => {
+const EventItem = ({ id, name, startDate, endDate, description, posterUrl, locationName, isSeatCategorized, numberOfTickets, contactInfo, idstatus_type, idevent_category }) => {
     const [isFavorite, setIsFavorite] = useState(() => {
         const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         return favorites.includes(id);

@@ -1,34 +1,15 @@
-import axios from "axios";
-// import cryptoJs from "crypto-js";
-// import { jwtDecode } from "jwt-decode";
-// function decryptTOKEN(token) {
-//   const decToken = cryptoJs.AES.decrypt(
-//     token,
-//     process.env.REACT_APP_API_SECRET
-//   ).toString(cryptoJs.enc.Utf8);
+import axios from 'axios';
 
-//   console.log("Decrypted token:", decToken);
-
-//   // Zapis odszyfrowanego tokenu i jego dekodowanie
-//   sessionStorage.setItem("decToken", decToken);
-//   const decoded = jwtDecode(decToken);
-//   sessionStorage.setItem("decoded", JSON.stringify(decoded));
-
-//   console.log("Decoded token:", decoded);
-// }
 export const getAllEvents = async () => {
-  console.log("asking for events");
   const res = await axios
     .get("api/events/read")
     .catch((err) => console.log(err));
 
-  if (!res || res.status !== 200) {
-    return console.log("No data");
-  }
-  console.log("got events");
-  const data = await res.data;
-
-  return data;
+    if(!res || res.status !== 200){
+         return console.log("No data");
+    }
+    const data = await res.data;
+    return data;
 };
 export const handleLogin = async (email, password) => {
   try {
@@ -58,24 +39,22 @@ export const handleLogin = async (email, password) => {
 };
 
 export const searchEvents = async (query) => {
-  try {
-    console.log("asking for events");
-    const res = await axios.get("/api/events/search", {
-      params: { name: query },
-    });
-
-    // Sprawdzamy, czy odpowiedź zakończyła się powodzeniem
-    if (res.status === 200 && res.data.success) {
-      console.log("got events");
-      return res.data.event; // Zwracamy znalezione wydarzenia
-    } else {
-      console.error("Search failed:", res.data.msg);
-      return [];
+    try {
+        const res = await axios.get('/api/events/search', {
+            params: { name: query }
+        });
+        
+        // Sprawdzamy, czy odpowiedź zakończyła się powodzeniem
+        if (res.status === 200 && res.data.success) {
+            return res.data.event; // Zwracamy znalezione wydarzenia
+        } else {
+            console.error("Search failed:", res.data.msg);
+            return [];
+        }
+    } catch (error) {
+        console.error("Error searching events:", error);
+        return [];
     }
-  } catch (error) {
-    console.error("Error searching events:", error);
-    return [];
-  }
 };
 export const getEventDetails = async (id) => {
   try {
@@ -86,7 +65,6 @@ export const getEventDetails = async (id) => {
     throw error;
   }
 };
-
 export const generateTicketData = (ticketData) => {
   try {
     return JSON.stringify(ticketData, null, 2); // Zwraca obiekt sformatowany w JSON
@@ -95,7 +73,6 @@ export const generateTicketData = (ticketData) => {
     return "{}"; // Zwraca pusty JSON w razie błędu
   }
 };
-
 // export const newBooking = async(data) => {
 //   const res = await axios
 //   .post('/booking', {
@@ -112,7 +89,6 @@ export const generateTicketData = (ticketData) => {
 //   const resData = await res.data;
 //   return resData;
 // }
-
 export const ConfirmBooking = async (data) => {
   try {
     // Sprawdzenie kategorii miejsc i cen
@@ -135,13 +111,11 @@ export const ConfirmBooking = async (data) => {
     console.log("Error in ConfirmBooking:", err);
   }
 };
-
 export const seatCategories = (inputPrice) => [
   { name: `Pierwsza Kategoria `, price: inputPrice * 3.0 },
   { name: `Druga Kategoria `, price: inputPrice * 2.0 },
   { name: `Trzecia Kategoria `, price: inputPrice },
 ];
-
 export const getPrice = async (eventId) => {
   try {
     const eventData = await getEventDetails(eventId);
@@ -169,7 +143,6 @@ export const getPrice = async (eventId) => {
     return "Błąd: Nieoczekiwany problem z połączeniem.";
   }
 };
-
 export const isSeatCategory = async (eventId) => {
   try {
     const eventData = await getEventDetails(eventId);
@@ -183,7 +156,6 @@ export const isSeatCategory = async (eventId) => {
     return false;
   }
 };
-
 export const getSeatCategories = async (eventId) => {
   try {
     const eventData = await getEventDetails(eventId);
@@ -223,21 +195,56 @@ export const getSeatCategories = async (eventId) => {
     return [];
   }
 };
-
 export const getCategoryNameById = async (categoryId) => {
-  try {
-    const eventRes = await axios.get(`/api/categories/read/${categoryId}`);
-    console.log("Category API response:", eventRes.data);
-
-    if (eventRes.status === 200 && eventRes.data && eventRes.data.data) {
-      return eventRes.data.data.category_type; // Pobiera `category_type` z obiektu `data`
-    } else {
-      return "Brak kategorii";
+    try {
+        const eventRes = await axios.get(`/api/categories/read/${categoryId}`);
+        console.log("Category API response:", eventRes.data);
+        
+        if (eventRes.status === 200 && eventRes.data && eventRes.data.data) {
+            return eventRes.data.data.category_type;  // Pobiera `category_type` z obiektu `data`
+        } else {
+            return "Brak kategorii";
+        }
+    } catch (error) {
+        console.error("Error fetching category name:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
-  } catch (error) {
-    console.error("Error fetching category name:", error);
-    return "Błąd: Nieoczekiwany problem z połączeniem.";
-  }
+};
+export const getAllCategories = async () => {
+    try {
+        const response = await axios.get('/api/categories/read');
+        console.log("Categories API response:", response.data);
+        return response.data.data || [];  // Zwraca `data` jako listę kategorii
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        return [];
+    }
+};
+
+export const getAllCities = async () => {
+    try {
+        const response = await axios.get('/api/cities/read');
+        console.log("Cities API response:", response.data);
+        return response.data.data || [];  // Zwraca `data` jako listę miast
+    } catch (error) {
+        console.error("Error fetching cities:", error);
+        return [];
+    }
+}
+
+export const getCityById = async (cityId) => {
+    try {
+        const cityRes = await axios.get(`/api/cities/read/${cityId}`);
+        console.log("City by id API response:", cityRes.data);
+        if(cityRes.status === 200 && cityRes.data && cityRes.data.data){
+            return cityRes.data.data.city_name;  // Pobiera `city_name` z obiektu `data`
+        } else {
+            return "Brak miasta";
+        }
+    } catch (error) {
+        console.error("Error fetching city name:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
+    }
 };
 
 export const getLocationById = async (locationId) => {
@@ -260,7 +267,6 @@ export const getLocationById = async (locationId) => {
     return "Błąd: Nieoczekiwany problem z połączeniem.";
   }
 };
-
 export const getAllPaymentMethods = async () => {
   try {
     const response = await axios.get("/api/payment/read");
@@ -271,43 +277,34 @@ export const getAllPaymentMethods = async () => {
     return [];
   }
 };
-
 export const getPaymentsMethodsById = async (paymentMethodId) => {
-  try {
-    const paymentMethodRes = await axios.get(
-      `/api/payment/read/${paymentMethodId}`
-    );
-    if (
-      paymentMethodRes.status === 200 &&
-      paymentMethodRes.data &&
-      paymentMethodRes.data.data
-    ) {
-      console.log("Payment method API response:", paymentMethodRes.data);
-      return paymentMethodRes.data.data.name; // Pobiera `payment_method` z obiektu `data`
-    } else {
-      return "Brak metody płatności";
+    try {
+        const paymentMethodRes = await axios.get(`/api/payment/read/${paymentMethodId}`);
+        if (paymentMethodRes.status === 200 && paymentMethodRes.data && paymentMethodRes.data.data) {
+            console.log("Payment method API response:", paymentMethodRes.data);
+            return paymentMethodRes.data.data.name;  // Pobiera `payment_method` z obiektu `data`
+        } else {
+            return "Brak metody płatności";
+        }
+    } catch (error) {
+        console.error("Error fetching payment method name:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
-  } catch (error) {
-    console.error("Error fetching payment method name:", error);
-    return "Błąd: Nieoczekiwany problem z połączeniem.";
-  }
-};
-
+}
 export const getStatusById = async (statusId) => {
-  try {
-    const statusRes = await axios.get(`/api/status/read/${statusId}`);
-    if (statusRes.status === 200 && statusRes.data && statusRes.data.data) {
-      console.log("Status API response:", statusRes.data);
-      return statusRes.data.data.name; // Pobiera `name` z obiektu `data`
-    } else {
-      return "Brak statusu";
+    try {
+        const statusRes = await axios.get(`/api/status/read/${statusId}`);
+        if (statusRes.status === 200 && statusRes.data && statusRes.data.data) {
+            console.log("Status API response:", statusRes.data);
+            return statusRes.data.data.name;  // Pobiera `name` z obiektu `data`
+        } else {
+            return "Brak statusu";
+        }
+    } catch (error) {
+        console.error("Error fetching status name:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
-  } catch (error) {
-    console.error("Error fetching status name:", error);
-    return "Błąd: Nieoczekiwany problem z połączeniem.";
-  }
-};
-
+}
 export const fetchEventCoordinates = async (locationName) => {
   try {
     const response = await axios.get(
@@ -322,22 +319,89 @@ export const fetchEventCoordinates = async (locationName) => {
       }
     );
 
-    // Sprawdź, czy odpowiedź zawiera dane o współrzędnych
-    if (response.data && response.data.length > 0) {
-      const { lat, lon } = response.data[0];
-      return {
-        latitude: parseFloat(lat),
-        longitude: parseFloat(lon),
-      };
-    } else {
-      console.error(
-        "Nie znaleziono współrzędnych dla lokalizacji:",
-        locationName
-      );
+        // Sprawdź, czy odpowiedź zawiera dane o współrzędnych
+        if (response.data && response.data.length > 0) {
+            const { lat, lon } = response.data[0];
+            return {
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lon)
+            };
+        } else {
+            console.error("Nie znaleziono współrzędnych dla lokalizacji:", locationName);
+            return null;
+        }
+    } catch (error) {
+        console.error("Błąd podczas wczytywania współrzędnych lokalizacji:", error);
+        return null;
+    }
+};
+export const getEventByCity = async (idCity) => {
+    const res = await axios
+    .get(`/api/events/read/city/${idCity}`)
+    .catch((err)=>console.log(err));
+
+    if(!res || res.status !== 200){
+         return console.log("No data");
+    }
+    const data = await res.data;
+    return data;
+};
+
+export const getEventsByDates = async (startDate, endDate) => {
+    try {
+      const res = await axios.get(`/api/events/dates`, {
+        params: { startDate, endDate },
+      });
+  
+      if (!res || res.status !== 200) {
+        console.error("Error fetching events by date range:", res.data);
+        return [];
+      }
+  
+      return res.data.events;
+    } catch (error) {
+      console.error("Error fetching events by date range:", error);
+      return [];
+    }
+  };
+
+// Funkcja do dodawania komentarza
+export const addComment = async (idevent, iduser, comment) => {
+    try {
+      const res = await axios.post("/api/comments/create", {
+        idevent,
+        iduser,
+        comment,
+      });
+  
+      if (res.status === 201) {
+        return res.data.comment; // Zwraca nowo utworzony komentarz
+      } else {
+        console.error("Error adding comment (err 201):");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
       return null;
     }
-  } catch (error) {
-    console.error("Błąd podczas wczytywania współrzędnych lokalizacji:", error);
-    return null;
-  }
-};
+  };
+  
+  // Funkcja do pobierania komentarzy dla konkretnego wydarzenia
+  export const getCommentsByEvent = async (idevent) => {
+    try {
+      const res = await axios.get(`/api/comments/read`, {
+        params: { idevent },
+      });
+  
+      if (res.status === 200) {
+        return res.data.comments.filter((comment) => comment.idevent === idevent);
+      } else {
+        console.error("Error fetching comments:", res.data.msg);
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      return [];
+    }
+  };
+
