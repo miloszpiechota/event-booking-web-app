@@ -11,8 +11,6 @@ export const getAllEvents = async () => {
     const data = await res.data;
     return data;
 };
-
-
 export const searchEvents = async (query) => {
     try {
         const res = await axios.get('/api/events/search', {
@@ -40,7 +38,6 @@ export const getEventDetails = async (id) => {
         throw error;
     }
 };
-
 export const generateTicketData = (ticketData) => {
     try {
         return JSON.stringify(ticketData, null, 2); // Zwraca obiekt sformatowany w JSON
@@ -49,8 +46,6 @@ export const generateTicketData = (ticketData) => {
         return "{}"; // Zwraca pusty JSON w razie błędu
     }
 };
-
-
 // export const newBooking = async(data) => {
 //   const res = await axios
 //   .post('/booking', {
@@ -67,7 +62,6 @@ export const generateTicketData = (ticketData) => {
 //   const resData = await res.data;
 //   return resData;
 // }
-
 export const ConfirmBooking = async (data) => {
     try {
         // Sprawdzenie kategorii miejsc i cen
@@ -90,14 +84,11 @@ export const ConfirmBooking = async (data) => {
         console.log("Error in ConfirmBooking:", err);
     }
 };
-
 export const seatCategories = (inputPrice) => [
     { name: `Pierwsza Kategoria `, price: inputPrice * 3.0 },
     { name: `Druga Kategoria `, price: inputPrice * 2.0 },
     { name: `Trzecia Kategoria `, price: inputPrice},
 ];
-
-
 export const getPrice = async (eventId) => {
     try {
         const eventData = await getEventDetails(eventId);
@@ -125,8 +116,6 @@ export const getPrice = async (eventId) => {
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 };
-
-
 export const isSeatCategory = async (eventId) => {
     try {
         const eventData = await getEventDetails(eventId);
@@ -140,7 +129,6 @@ export const isSeatCategory = async (eventId) => {
         return false;
     }
 };
-
 export const getSeatCategories = async (eventId) => {
     try {
         const eventData = await getEventDetails(eventId);
@@ -171,8 +159,6 @@ export const getSeatCategories = async (eventId) => {
         return [];
     }
 };
-
-
 export const getCategoryNameById = async (categoryId) => {
     try {
         const eventRes = await axios.get(`/api/categories/read/${categoryId}`);
@@ -185,6 +171,42 @@ export const getCategoryNameById = async (categoryId) => {
         }
     } catch (error) {
         console.error("Error fetching category name:", error);
+        return "Błąd: Nieoczekiwany problem z połączeniem.";
+    }
+};
+export const getAllCategories = async () => {
+    try {
+        const response = await axios.get('/api/categories/read');
+        console.log("Categories API response:", response.data);
+        return response.data.data || [];  // Zwraca `data` jako listę kategorii
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        return [];
+    }
+};
+
+export const getAllCities = async () => {
+    try {
+        const response = await axios.get('/api/cities/read');
+        console.log("Cities API response:", response.data);
+        return response.data.data || [];  // Zwraca `data` jako listę miast
+    } catch (error) {
+        console.error("Error fetching cities:", error);
+        return [];
+    }
+}
+
+export const getCityById = async (cityId) => {
+    try {
+        const cityRes = await axios.get(`/api/cities/read/${cityId}`);
+        console.log("City by id API response:", cityRes.data);
+        if(cityRes.status === 200 && cityRes.data && cityRes.data.data){
+            return cityRes.data.data.city_name;  // Pobiera `city_name` z obiektu `data`
+        } else {
+            return "Brak miasta";
+        }
+    } catch (error) {
+        console.error("Error fetching city name:", error);
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 };
@@ -205,7 +227,6 @@ export const getLocationById = async (locationId) => {
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 };
-
 export const getAllPaymentMethods = async () => {
     try {
         const response = await axios.get('/api/payment/read');
@@ -216,7 +237,6 @@ export const getAllPaymentMethods = async () => {
         return [];
     }
 };
-
 export const getPaymentsMethodsById = async (paymentMethodId) => {
     try {
         const paymentMethodRes = await axios.get(`/api/payment/read/${paymentMethodId}`);
@@ -231,7 +251,6 @@ export const getPaymentsMethodsById = async (paymentMethodId) => {
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 }
-
 export const getStatusById = async (statusId) => {
     try {
         const statusRes = await axios.get(`/api/status/read/${statusId}`);
@@ -246,7 +265,6 @@ export const getStatusById = async (statusId) => {
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 }
-
 export const fetchEventCoordinates = async (locationName) => {
     try {
         const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
@@ -274,4 +292,73 @@ export const fetchEventCoordinates = async (locationName) => {
         return null;
     }
 };
+export const getEventByCity = async (idCity) => {
+    const res = await axios
+    .get(`/api/events/read/city/${idCity}`)
+    .catch((err)=>console.log(err));
+
+    if(!res || res.status !== 200){
+         return console.log("No data");
+    }
+    const data = await res.data;
+    return data;
+};
+
+export const getEventsByDates = async (startDate, endDate) => {
+    try {
+      const res = await axios.get(`/api/events/dates`, {
+        params: { startDate, endDate },
+      });
+  
+      if (!res || res.status !== 200) {
+        console.error("Error fetching events by date range:", res.data);
+        return [];
+      }
+  
+      return res.data.events;
+    } catch (error) {
+      console.error("Error fetching events by date range:", error);
+      return [];
+    }
+  };
+
+// Funkcja do dodawania komentarza
+export const addComment = async (idevent, iduser, comment) => {
+    try {
+      const res = await axios.post("/api/comments/create", {
+        idevent,
+        iduser,
+        comment,
+      });
+  
+      if (res.status === 201) {
+        return res.data.comment; // Zwraca nowo utworzony komentarz
+      } else {
+        console.error("Error adding comment (err 201):");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      return null;
+    }
+  };
+  
+  // Funkcja do pobierania komentarzy dla konkretnego wydarzenia
+  export const getCommentsByEvent = async (idevent) => {
+    try {
+      const res = await axios.get(`/api/comments/read`, {
+        params: { idevent },
+      });
+  
+      if (res.status === 200) {
+        return res.data.comments.filter((comment) => comment.idevent === idevent);
+      } else {
+        console.error("Error fetching comments:", res.data.msg);
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      return [];
+    }
+  };
 
