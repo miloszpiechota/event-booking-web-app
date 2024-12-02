@@ -8,6 +8,7 @@ import UserRegistration from "./components/Registration/UserRegistration";
 import ConfirmBooking from "./components/Confirm/ConfirmBooking";
 import Confirmation from "./components/Confirm/Confirmation";
 import ConfirmTicket from "./components/Ticket/ConfirmTicket";
+import EventForm from "components/Events/EventForm";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/confirm" element={<ConfirmBooking />} />
           <Route path="/confirmation" element={<Confirmation />} />
           <Route path="/confirm-ticket" element={<ConfirmTicket />} />
+          <Route path="/form" element={<EventForm />} />
 
         </Routes>
       </section>

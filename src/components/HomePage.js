@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import { Box, Typography, Button } from "@mui/material";
+import ButtonJoy from '@mui/joy/Button';
+import TypographyJoy from '@mui/joy/Typography';
+
 import Sheet from "@mui/joy/Sheet";
 import Dropdown from "@mui/joy/Dropdown";
 import MenuButton from "@mui/joy/MenuButton";
@@ -18,6 +21,10 @@ import {
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import eventImage from "../images/pexels-oandremoura-2675648.jpg";
+import ArrowCircleLeftRoundedIcon from '@mui/icons-material/ArrowCircleLeftRounded';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import Add from '@mui/icons-material/Add';
+
 
 const HomePage = () => {
   const [events, setEvents] = useState([]);
@@ -187,8 +194,8 @@ const HomePage = () => {
     speed: 1000,
     autoplaySpeed: 3000,
     cssEase: "linear",
-        nextArrow: <SampleNextArrow />,
-        prevArrow: <SamplePrevArrow />
+    nextArrow: <ArrowCircleRightIcon fontSize="large" color="primary" />,
+    prevArrow: <ArrowCircleLeftRoundedIcon fontSize="large" color="primary"/>
   };
   
 
@@ -204,16 +211,24 @@ const HomePage = () => {
       >
         <img src={eventImage} alt="Event" width="auto" height="100%" />
       </Box>
-      <Box padding={5} margin="auto">
-        <Typography variant="h4" textAlign="center">
-          Welcome to EventBookings
-        </Typography>
-      </Box>
+      
+        <TypographyJoy level="h1"  textAlign="center">
+          Witaj w EventBookings!
+        </TypographyJoy>
+        
+      
       <Box margin="auto" width="80%">
-        <Sheet
+      <Box padding={2} textAlign="center">
+        <TypographyJoy >
+          EventBookings to platforma, która umożliwia odkrywanie, rezerwowanie oraz organizowanie wydarzeń w Twoim mieście. 
+          Znajdź wydarzenie, które Cię interesuje, przeglądaj kategorie, odkrywaj nowe miejsca i dodawaj swoje wydarzenia.
+          Dzięki zaawansowanym funkcjom, takim jak filtrowanie wydarzeń według miasta i kategorii, możliwość dodawania własnych lokalizacji
+          oraz integracja z mapami, EventBookings zapewnia niezrównaną wygodę i funkcjonalność.
+        </TypographyJoy>
+</Box>
+
+      <Sheet
           variant="solid"
-          color="success"
-          invertedColors
           sx={{
             display: "flex",
             alignItems: "center",
@@ -221,9 +236,9 @@ const HomePage = () => {
             p: 2,
             borderRadius: { xs: 0, sm: "sm" },
             minWidth: "min-content",
-            background: `linear-gradient(to top, #4caf50, #66bb6a)`,
+            background: `linear-gradient(to top, #4A79D9, #5C8BD9)`,
           }}
-        >
+      >
           <Box sx={{ flex: 1, display: "flex", gap: 2 }}>
             {/* Kategorie Dropdown */}
             <Dropdown>
@@ -308,39 +323,18 @@ const HomePage = () => {
                 )}
               </Menu>
             </Dropdown>
+            
+            <ButtonJoy variant="soft"
+                size="sm"
+                sx={{
+                   "--Button-radius": "1.5rem",
+              }}
+              startDecorator={<Add />}
+              component={Link}
+              to="/form">Add event
+            </ButtonJoy>
           </Box>
         </Sheet>
-
-        {/* Slider with events */}
-        {/* {noEventsMessage ? (
-          <Typography textAlign="center" color="error" marginTop={5}>
-            {noEventsMessage}
-          </Typography>
-        ) : (
-          <div className="slider-container">
-            <Slider {...settings}>
-              {filteredEvents.map((event, index) => (
-                <Box key={index} padding={2}>
-                  <EventItem
-                    id={event.idevent}
-                    name={event.name}
-                    startDate={event.start_date}
-                    endDate={event.end_date}
-                    description={event.description}
-                    numberOfTickets={event.number_of_ticket}
-                    posterUrl={event.photo}
-                    contactInfo={event.contact_info}
-                    idstatus_type={event.idstatus_type}
-                    isSeatCategorized={event.is_seat_categorized}
-                    locationName={event.location_name}
-                    idevent_category={event.idevent_category}
-                  />
-                </Box>
-              ))}
-            </Slider>
-          </div>
-        )} */}
-      {/* Slider with events */}
 {noEventsMessage ? (
   <Typography textAlign="center" color="error" marginTop={5}>
     {noEventsMessage}
@@ -393,7 +387,7 @@ const HomePage = () => {
           component={Link}
           to="/events"
           variant="outlined"
-          sx={{ color: "#2b2d42", borderColor: "#2b2d42" }}
+          sx={{ color: "#4A79D9", borderColor: "#011C40" }}
         >
           View All Events
         </Button>
