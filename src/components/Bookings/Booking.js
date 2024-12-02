@@ -1,11 +1,14 @@
 import { Box, Typography, TextField, IconButton,  List,
     ListItem,
-    ListItemText, } from "@mui/material";
+    ListItemText,
+    ListItemAvatar, } from "@mui/material";
 import Textarea from "@mui/joy/Textarea";
 import Button from "@mui/joy/Button";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import Add from '@mui/icons-material/Add';
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import PersonIcon from '@mui/icons-material/Person';
+import FavoriteBorder from "@mui/icons-material/Favorite";
 import {
   getEventDetails,
   getCategoryNameById,
@@ -96,21 +99,22 @@ const Booking = () => {
     },
   });
   const handleAddComment = async () => {
-    if (!newComment.trim()) return; // Nie pozwalaj na dodawanie pustych komentarzy
+    if (!newComment.trim()) return;
 
     const commentData = {
         comment: newComment,
-        iduser: parseInt(localStorage.getItem("userId")), // Pobierz ID użytkownika z localStorage
-        idevent: parseInt(id),
+        iduser: 5, // Upewnij się, że userId jest prawidłowy
+        idevent: parseInt(id), // Id wydarzenia
         date_comment: new Date(),
-      };
+    };
 
-    const addedComment = await addComment(commentData); // Używa ID użytkownika 1 jako przykład
+    const addedComment = await addComment(commentData);
     if (addedComment) {
-      setComments((prev) => [...prev, addedComment]);
-      setNewComment("");
+        setComments((prev) => [...prev, addedComment]);
+        setNewComment("");
     }
-  };
+};
+//DODALES 5 DO IDUSER I ZOBACZ CZY DZIALA
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -200,6 +204,7 @@ const Booking = () => {
           <Typography variant="h4" gutterBottom textAlign="center">
             {event.name}
           </Typography>
+          
           <IconButton
             onClick={toggleFavorite}
             sx={{ color: isFavorite ? "red" : "grey" }}
@@ -321,6 +326,7 @@ const Booking = () => {
           {comments.length > 0 ? (
             comments.map((comment) => (
               <ListItem key={comment.idcomment}>
+                <ListItemAvatar><PersonIcon /></ListItemAvatar>
                 <ListItemText
                   primary={comment.comment}
                   secondary={new Date(comment.date_comment).toLocaleString()}
@@ -345,7 +351,8 @@ const Booking = () => {
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
         <Button
           onClick={handleAddComment}
-          startDecorator={<Add />}
+                startDecorator={<Add />}
+                sx={{ bgcolor: "#4A79D9" }}
         >
           Dodaj komentarz
         </Button>
@@ -354,7 +361,7 @@ const Booking = () => {
           <Box display="flex" justifyContent="center" marginTop={3} >
             <Button
               endDecorator={<KeyboardArrowRight />}
-              color="success"
+              sx={{ bgcolor: "#4A79D9" }}
               onClick={handleSubmit(onSubmit)}
             >
               Next (Confirm)

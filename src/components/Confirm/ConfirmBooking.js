@@ -112,7 +112,7 @@ const ConfirmBooking = () => {
                             </Select>
                         </FormControl>
                         <Box display="flex" justifyContent="center" marginTop={3}>
-                        <Button type="submit" endDecorator={<KeyboardArrowRight />} color="success">
+                        <Button type="submit" endDecorator={<KeyboardArrowRight />} sx={{ bgcolor: "#4A79D9" }}>
                             Zatwierdź
                         </Button>
                         </Box>

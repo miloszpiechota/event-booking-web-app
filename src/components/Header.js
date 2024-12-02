@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AppBar, Tab, Toolbar, Tabs, IconButton } from "@mui/material";
 import { Box } from "@mui/system";
-import Autocomplete from "@mui/joy/Autocomplete";
-import EventIcon from "@mui/icons-material/Event";
-import { searchEvents } from "../api-helpers/api-helpers";
+import Autocomplete from '@mui/joy/Autocomplete';
+import HomeIcon from '@mui/icons-material/Home';
+import { searchEvents }  from "../api-helpers/api-helpers";
+
 
 const Header = () => {
   const [value, setValue] = useState(0);
@@ -41,12 +42,13 @@ const Header = () => {
   };
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: "green" }}>
+    <AppBar position="sticky" sx={{ bgcolor: "#011C40" }}>
       <Toolbar>
         <Box width={"20%"}>
           <IconButton component={Link} to="/">
-            <EventIcon />
+            <HomeIcon color="primary" /> 
           </IconButton>
+          
         </Box>
         <Box width={"50%"} margin={"auto"}>
           <Autocomplete

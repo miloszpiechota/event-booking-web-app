@@ -1,4 +1,7 @@
 import axios from 'axios';
+const getAuthToken = () => {
+    return localStorage.getItem("token"); // Zakładamy, że token jest przechowywany w localStorage
+};
 
 export const getAllEvents = async () => {
   const res = await axios
@@ -306,6 +309,16 @@ export const getStatusById = async (statusId) => {
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 }
+export const getAllStatuses = async () => {
+    try {
+        const response = await axios.get('/api/status/read');
+        console.log("Statuses API response:", response.data);
+        return response.data.data || [];  // Zwracamy `data` jako listę statusów
+    } catch (error) {
+        console.error("Error fetching statuses:", error);
+        return [];
+    }
+}
 export const fetchEventCoordinates = async (locationName) => {
   try {
     const response = await axios.get(
@@ -367,28 +380,24 @@ export const getEventsByDates = async (startDate, endDate) => {
   };
 
 // Funkcja do dodawania komentarza
-export const addComment = async (idevent, iduser, comment) => {
+export const addComment = async (commentData) => {
     try {
-      const res = await axios.post("/api/comments/create", {
-        idevent,
-        iduser,
-        comment,
-      });
-  
-      if (res.status === 201) {
-        return res.data.comment; // Zwraca nowo utworzony komentarz
-      } else {
-        console.error("Error adding comment (err 201):");
-        return null;
-      }
+        const res = await axios.post("/api/comments/create", commentData);
+
+        if (res.status === 201) {
+            return res.data.comment; // Zwraca nowo utworzony komentarz
+        } else {
+            console.error("Error adding comment:", res.data.error);
+            return null;
+        }
     } catch (error) {
-      console.error("Error adding comment:", error);
-      return null;
+        console.error("Error adding comment:", error);
+        return null;
     }
-  };
-  
+};
+ 
   // Funkcja do pobierania komentarzy dla konkretnego wydarzenia
-  export const getCommentsByEvent = async (idevent) => {
+export const getCommentsByEvent = async (idevent) => {
     try {
       const res = await axios.get(`/api/comments/read`, {
         params: { idevent },
@@ -404,7 +413,65 @@ export const addComment = async (idevent, iduser, comment) => {
       console.error("Error fetching comments:", error);
       return [];
     }
-  };
+};
+
+// Działać chyba działa ale ta autoryzacja, pogadaj z Piotrkiem o tym
+export const createEvent = async (eventData) => {
+    try {
+        const response = await axios.post(
+            "/api/events/create",
+            eventData
+            // {
+            //     headers: {
+            //         Authorization: `Bearer ${getAuthToken()}`, // Dodanie tokenu JWT do nagłówka
+            //     },
+            // }
+        );
+        if (response.status === 201) {
+            console.log("Event created successfully:", response.data);
+            return { success: true, data: response.data };
+        } else {
+            console.error("Failed to create event:", response.data);
+            return { success: false, error: response.data };
+        }
+    } catch (error) {
+        console.error("Error creating event:", error);
+        return { success: false, error: error.message };
+    }
+};
+
+
+
+// Fetch suggested locations from OpenStreetMap
+export const getSuggestedLocations = async (query, city) => {
+  try {
+    const response = await axios.get("https://nominatim.openstreetmap.org/search", {
+      params: {
+        q: `${query}, ${city}`,
+        format: "json",
+        addressdetails: 1,
+        limit: 5,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching suggested locations:", error);
+    return [];
+  }
+};
+
+// Create new event location
+export const createEventLocation = async (locationData) => {
+  try {
+    const response = await axios.post("/api/locations/create", locationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating new location:", error);
+    throw error;
+  }
+};
+
+
 
 export const getUserInfo = async (iduser) => {
   try{

@@ -612,18 +612,16 @@ const Events = () => {
   return (
     <Box margin="auto" width="80%">
       <Sheet
-        variant="solid"
-        color="success"
-        invertedColors
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexGrow: 1,
-          p: 2,
-          borderRadius: { xs: 0, sm: "sm" },
-          minWidth: "min-content",
-          background: `linear-gradient(to top, #4caf50, #66bb6a)`,
-        }}
+          variant="solid"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexGrow: 1,
+            p: 2,
+            borderRadius: { xs: 0, sm: "sm" },
+            minWidth: "min-content",
+            background: `linear-gradient(to top, #4A79D9, #5C8BD9)`,
+          }}
       >
         <Box sx={{ flex: 1, display: "flex", gap: 2 }}>
           <Dropdown>
