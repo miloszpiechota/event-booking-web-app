@@ -23,6 +23,7 @@ export const handleLogin = async (email, password) => {
 
     //sprawdź status odpowiedzi
     if (res.status !== 200) {
+        console.log(res.data)
         return res;
     }
     //deszyfruj token jeśli chcesz
@@ -405,3 +406,140 @@ export const addComment = async (idevent, iduser, comment) => {
     }
   };
 
+export const getUserInfo = async (iduser) => {
+  try{
+    const token = sessionStorage.getItem('token');
+    console.log("getuserinfo");
+    console.log(token);
+    if(token == null){
+      return [];
+    }
+    console.log("asking for user info");
+    console.log(iduser);
+    const res = await axios.post(`/api/users/read/${iduser}`, null, {
+      headers: {
+        'authorization': `Bearer ${token}`
+      }
+    });
+    if(res.status === 200){
+      console.log("got user info");
+      console.log(res.data)
+      return res.data.user;
+    }else if(res.status === 403){
+      console.error("Access denied");
+      return [];
+    }else if(res.status === 404){
+      console.error("User not found");
+      return [];
+    }else{
+      console.error("Error fetching comments:", res.data.msg);
+        return [];
+    }
+    
+  }catch(e){
+    console.error(e.message);
+  }
+}
+
+export const getUserTypes = async () => {
+  try{
+    const token = sessionStorage.getItem('token');
+   
+    if(token == null){
+      return [];
+    }
+    
+    const res = await axios.get(`/api/users/types/read`, {
+      headers: {
+        'authorization': `Bearer ${token}`
+      }
+    });
+    console.log(res);
+    if(res.status === 200){
+      
+      return res.data.data.user_types;
+    }else if(res.status === 403){
+      console.error("Access denied");
+      return [];
+    }else if(res.status === 404){
+      console.error("User not found");
+      return [];
+    }else{
+      console.error("Error fetching comments:", res.data.msg);
+        return [];
+    }
+    
+  }catch(e){
+    console.error(e.message);
+  }
+}
+
+export const getUserOrders = async (iduser) => {
+  try{
+    const token = sessionStorage.getItem('token');
+    console.log("getuserorders");
+    console.log(token);
+    if(token == null){
+      return [];
+    }
+    console.log("asking for user orders");
+    console.log(iduser);
+    const res = await axios.get(`/api/orders/read/user/${iduser}`, {
+      headers: {
+        'authorization': `Bearer ${token}`
+      }
+    });
+    if(res.status === 200){
+      console.log("got user orders");
+      console.log(res.data.orders)
+      return res.data.orders;
+    }else if(res.status === 403){
+      console.error("Access denied");
+      return [];
+    }else if(res.status === 404){
+      console.error("User not found");
+      return [];
+    }else{
+      console.error("Error fetching comments:", res.data.msg);
+        return [];
+    }
+    
+  }catch(e){
+    console.error(e.message);
+  }
+}
+
+export const getUserOrder = async (idorder) => {
+  try{
+    const token = sessionStorage.getItem('token');
+    console.log("getuserorders");
+    console.log(token);
+    if(token == null){
+      return [];
+    }
+    console.log("asking for specific order");
+    console.log(idorder);
+    const res = await axios.get(`/api/orders/read/${idorder}`, {
+      headers: {
+        'authorization': `Bearer ${token}`
+      }
+    });
+    if(res.status === 200){
+      console.log("got user orders");
+      console.log(res.data)
+      return res.data.order;
+    }else if(res.status === 403){
+      console.error("Access denied");
+      return [];
+    }else if(res.status === 404){
+      console.error("User not found");
+      return [];
+    }else{
+      console.error("Error fetching comments:", res.data.msg);
+        return [];
+    }
+    
+  }catch(e){
+    console.error(e.message);
+  }
+}

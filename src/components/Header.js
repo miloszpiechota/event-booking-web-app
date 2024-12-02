@@ -69,20 +69,22 @@ const Header = () => {
             onChange={(e, val) => setValue(val)}
           >
             <Tab component={Link} to="/events" label="Events" />
-            <Tab label="Admin" component={Link} to="/admin" />
+            
             <Tab label="Auth" component={Link} to="/auth" />
-            <Tab label="Register" component={Link} to="/register" />
-            <Tab label="Profile" component={Link} to="/user" />
+            
+            
             {sessionStorage["token"] ? (
-              <Tab
-                label="Logout"
-                onClick={() => {
-                  logout();
-                  navigate("/");
-                }}
-              />
+              <React.Fragment>
+                {/* <Tab label="Profile" component={Link} to="/user" />
+                <Tab label="Admin" component={Link} to="/admin" /> */}
+                <Tab label="Panel użytkownika" component={Link} to="/panel" />
+                <Tab label="Logout" onClick={() => { logout(); navigate("/"); }}/>
+              </React.Fragment>
             ) : (
-              <Tab label="UserLogin" component={Link} to="/login" />
+              <React.Fragment>
+                <Tab label="Register" component={Link} to="/register" />
+                <Tab label="UserLogin" component={Link} to="/login" />
+              </React.Fragment>
             )}
           </Tabs>
         </Box>
