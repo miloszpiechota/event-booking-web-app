@@ -127,7 +127,8 @@ const EventItem = ({ id, name, startDate, endDate, description, posterUrl, locat
     };
 
     return (
-        <Card sx={{ maxWidth: 345, margin: 2, ":hover": { boxShadow: "10px 10px 20px #ccc" } }}>
+        /*
+        <Card sx={{ maxWidth: 345, height:'590px' , margin: 2, ":hover": { boxShadow: "10px 10px 20px #ccc" } }}>
             <CardHeader
                 subheader={`${dayjs(startDate).format("L")} - ${dayjs(endDate).format("L")}`}
                 action={
@@ -177,6 +178,56 @@ const EventItem = ({ id, name, startDate, endDate, description, posterUrl, locat
                 </CardContent>
             </Collapse>
         </Card>
+        */
+        <Card 
+    sx={{ 
+        maxWidth: 345, 
+        height: '590px', 
+        margin: 2, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'space-between', 
+        ":hover": { boxShadow: "10px 10px 20px #ccc" } 
+    }}
+>
+    <div>
+        <CardHeader
+            subheader={`${dayjs(startDate).format("L")} - ${dayjs(endDate).format("L")}`}
+            action={
+                <IconButton
+                    onClick={toggleFavorite}
+                    sx={{ color: isFavorite ? 'red' : 'grey' }}
+                    aria-label="add to favorites"
+                >
+                    <FavoriteIcon />
+                </IconButton>
+            }
+        />
+        <CardMedia component="img" height="194" image={posterUrl} alt="Event image" />
+        <CardContent>
+            <Typography variant="h5" align="center">{name}</Typography>
+            <Typography variant="body2" sx={{ textAlign: 'justify', color: 'text.secondary' }}>
+                {description}
+            </Typography>
+        </CardContent>
+    </div>
+    <CardActions 
+        disableSpacing 
+        sx={{ marginTop: 'auto', flexDirection: 'column', gap: 1 }}
+    >
+        <Button
+            variant="contained"
+            fullWidth
+            component={Link}
+            to={`/booking/${id}`}
+            sx={{ bgcolor: "#2b2d42", ":hover": { bgcolor: "#121217" } }}
+            size="medium"
+        >
+            Book
+        </Button>
+    </CardActions>
+</Card>
+
     );
 };
 

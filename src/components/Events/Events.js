@@ -673,7 +673,10 @@ const Events = () => {
               />
               <Button
                 variant="contained"
-                color="primary"
+                style={{
+                  backgroundColor: "#011C40",
+                  color: "#ffffff",
+                }}
                 onClick={filterEventsByDate}
                 disabled={!startDate || !endDate}
               >
