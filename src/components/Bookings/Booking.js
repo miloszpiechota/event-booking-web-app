@@ -114,7 +114,7 @@ const Booking = () => {
         setNewComment("");
     }
 };
-//DODALES 5 DO IDUSER I ZOBACZ CZY DZIALA
+
 
   useEffect(() => {
     const fetchComments = async () => {

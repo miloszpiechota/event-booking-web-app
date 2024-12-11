@@ -41,7 +41,6 @@ export const handleLogin = async (email, password) => {
     // return { success: false, msg: error.message || "An error occurred while logging in." };
   }
 };
-
 export const searchEvents = async (query) => {
     try {
         const res = await axios.get('/api/events/search', {
@@ -77,44 +76,29 @@ export const generateTicketData = (ticketData) => {
     return "{}"; // Zwraca pusty JSON w razie błędu
   }
 };
-// export const newBooking = async(data) => {
-//   const res = await axios
-//   .post('/booking', {
-//     seatNumber: data.seatNumber,
-//     date: data.date,
-//     event: data.event,
-//     user: localStorage.getItem("userId"),
-//   })
-//   .catch((err)=>console.log(err));
+// export const ConfirmBooking = async (data) => {
+//   try {
+//     // Sprawdzenie kategorii miejsc i cen
+//     const seatCategoryInfo = await isSeatCategory(data.event);
 
-//   if(!res || res.status !== 200) {
-//     return console.log("Unexpected Error");
+//     const res = await axios.post("/confirm", {
+//       seatNumber: data.seatNumber,
+//       date: data.date,
+//       event: data.event,
+//       user: localStorage.getItem("userId"),
+//       seatCategoryInfo, // Dodajemy seatCategoryInfo do zapytania
+//     });
+
+//     if (res.status !== 200) {
+//       throw new Error("Unexpected Error");
+//     }
+
+//     return res.data;
+//   } catch (err) {
+//     console.log("Error in ConfirmBooking:", err);
 //   }
-//   const resData = await res.data;
-//   return resData;
-// }
-export const ConfirmBooking = async (data) => {
-  try {
-    // Sprawdzenie kategorii miejsc i cen
-    const seatCategoryInfo = await isSeatCategory(data.event);
+// };
 
-    const res = await axios.post("/confirm", {
-      seatNumber: data.seatNumber,
-      date: data.date,
-      event: data.event,
-      user: localStorage.getItem("userId"),
-      seatCategoryInfo, // Dodajemy seatCategoryInfo do zapytania
-    });
-
-    if (res.status !== 200) {
-      throw new Error("Unexpected Error");
-    }
-
-    return res.data;
-  } catch (err) {
-    console.log("Error in ConfirmBooking:", err);
-  }
-};
 export const seatCategories = (inputPrice) => [
   { name: `Pierwsza Kategoria `, price: inputPrice * 3.0 },
   { name: `Druga Kategoria `, price: inputPrice * 2.0 },
@@ -224,7 +208,6 @@ export const getAllCategories = async () => {
         return [];
     }
 };
-
 export const getAllCities = async () => {
     try {
         const response = await axios.get('/api/cities/read');
@@ -235,7 +218,6 @@ export const getAllCities = async () => {
         return [];
     }
 }
-
 export const getCityById = async (cityId) => {
     try {
         const cityRes = await axios.get(`/api/cities/read/${cityId}`);
@@ -250,7 +232,6 @@ export const getCityById = async (cityId) => {
         return "Błąd: Nieoczekiwany problem z połączeniem.";
     }
 };
-
 export const getLocationById = async (locationId) => {
   try {
     const locationRes = await axios.get(`/api/locations/read/${locationId}`);
@@ -377,11 +358,13 @@ export const getEventsByDates = async (startDate, endDate) => {
       console.error("Error fetching events by date range:", error);
       return [];
     }
-  };
+};
 
 // Funkcja do dodawania komentarza
 export const addComment = async (commentData) => {
-    try {
+  try {
+      
+    console.log("commentData", commentData);
         const res = await axios.post("/api/comments/create", commentData);
 
         if (res.status === 201) {
@@ -396,7 +379,7 @@ export const addComment = async (commentData) => {
     }
 };
  
-  // Funkcja do pobierania komentarzy dla konkretnego wydarzenia
+// Funkcja do pobierania komentarzy dla konkretnego wydarzenia
 export const getCommentsByEvent = async (idevent) => {
     try {
       const res = await axios.get(`/api/comments/read`, {
@@ -440,8 +423,6 @@ export const createEvent = async (eventData) => {
     }
 };
 
-
-
 // Fetch suggested locations from OpenStreetMap
 export const getSuggestedLocations = async (query, city) => {
   try {
@@ -470,8 +451,6 @@ export const createEventLocation = async (locationData) => {
     throw error;
   }
 };
-
-
 
 export const getUserInfo = async (iduser) => {
   try{
@@ -610,3 +589,12 @@ export const getUserOrder = async (idorder) => {
     console.error(e.message);
   }
 }
+const servicePrice = 5.25;
+export const printPrice = async (price) => {
+  return {
+      withServicePrice: price + servicePrice,
+      noServicePrice: price - servicePrice,
+      servicePrice: servicePrice,
+      basePrice: price,
+  };
+};
