@@ -228,7 +228,12 @@ const Booking = () => {
               style={{ borderRadius: "4px" }}
             />
           </Box>
-
+          <Box marginTop={3} marginBottom={3}>
+          <Typography variant="h6">Opis wydarzenia:</Typography>
+            <Typography>
+               {event.description}
+            </Typography>
+          </Box>
           <Box marginTop={3} marginBottom={3}>
             <Typography variant="h6">Szczegóły wydarzenia:</Typography>
             <Typography>
@@ -278,7 +283,7 @@ const Booking = () => {
           </Box>
 
           <Box paddingTop={2} marginBottom={3}>
-            <Typography fontWeight="bold">Seat Category Info:</Typography>
+            <Typography fontWeight="bold">Pule biletów:</Typography>
             {seatCategoryInfo.length > 0 ? (
               seatCategoryInfo.map((category, index) => (
                 <Typography key={index}>

@@ -53,6 +53,8 @@ const UserPanel = () => {
               Zakupione Bilety
             </a>
           </li>
+
+
           <li className="nav-item">
             <a
               className={`nav-link ${
@@ -64,9 +66,39 @@ const UserPanel = () => {
                 setActiveTab("DaneUzytkownika");
               }}
             >
-              Dane Użytkownika
+              Panel Administratora
             </a>
           </li>
+          <li className="nav-item">
+            <a
+              className={`nav-link ${
+                activeTab === "DaneUzytkownika" ? "active" : ""
+              }`}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("DaneUzytkownika");
+              }}
+            >
+              Panel Twórcy Wydarzeń
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              className={`nav-link ${
+                activeTab === "DaneUzytkownika" ? "active" : ""
+              }`}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("DaneUzytkownika");
+              }}
+            >
+              Panel Moderatora
+            </a>
+          </li>
+          
+
         </ul>
       </div>
 

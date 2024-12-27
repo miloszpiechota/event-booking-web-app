@@ -146,7 +146,7 @@ const [user_types, setUserTypes] = useState([]);
             <select
               className="form-control"
               value={user.iduser_type || ""}  // Początkowa wartość miasta
-              disabled={!isEditable}    // Edytowalne tylko w trybie edycji
+              disabled    // Edytowalne tylko w trybie edycji
               onChange={(e) => {
                 // Aktualizacja miasta w danych użytkownika
                 setUser({
