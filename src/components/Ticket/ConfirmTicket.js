@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
 
 // import html2pdf from 'html2pdf.js';
-import { generateTicketData, fetchEventCoordinates } from '../../api-helpers/api-helpers';
+import { generateTicketData, fetchEventCoordinates, printPrice } from '../../api-helpers/api-helpers';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -37,7 +37,7 @@ const MapCenterUpdater = ({ coordinates }) => {
     return null;
 };
 
-const ConfirmTicket = () => {
+const ConfirmTicket =  () => {
     const location = useLocation();
     const {
         selectedCategory,
@@ -53,6 +53,8 @@ const ConfirmTicket = () => {
     } = location.state || {};
 
     const [coordinates, setCoordinates] = useState(null); // Ustawienie jako null na start
+    const [ticketPrices, setTicketPrices] = useState(null);
+    const popupRef = useRef(null); // Referencja do Popup
 
     useEffect(() => {
         const loadCoordinates = async () => {
@@ -69,8 +71,21 @@ const ConfirmTicket = () => {
                 }
             }
         };
+        const loadPrices = async () => {
+            if (selectedCategory?.price || price) {
+                const result = await printPrice(selectedCategory?.price || price);
+                setTicketPrices(result);
+            }
+        };
+        loadPrices();
         loadCoordinates();
-    }, [locationName]);
+    }, [locationName, selectedCategory?.price, price]);
+
+    useEffect(() => {
+        if (popupRef.current) {
+            popupRef.current.openPopup(); // Otwórz Popup automatycznie po załadowaniu
+        }
+    }, [coordinates]);
 
     const ticketData = {
         eventName,
@@ -111,6 +126,9 @@ const ConfirmTicket = () => {
         }
     };
 
+ 
+    
+
     return (
         <Box padding={5} border="1px solid #ccc" borderRadius={4} maxWidth="600px" margin="auto">
             <Box id="ticket">
@@ -133,7 +151,12 @@ const ConfirmTicket = () => {
                     <Typography><strong>Kategoria:</strong> {selectedCategory?.name || "Bilet niekategoryzowany"}</Typography>
                     <Typography><strong>Cena za sztukę:</strong> {selectedCategory?.price || price} zł</Typography>
                     <Typography><strong>Ilość:</strong> {quantity}</Typography>
-                    <Typography><strong>Łączna cena:</strong> {(selectedCategory?.price || price) * quantity} zł</Typography>
+                    {ticketPrices && (
+                            <>
+                                <Typography><strong>Cena opłaty serwisowej:</strong> {ticketPrices.servicePrice * quantity} zł</Typography>
+                                <Typography><strong>Łączna cena z opłatą serwisową:</strong> {ticketPrices.withServicePrice * quantity} zł</Typography>
+                            </>
+                        )}
                     <Typography><strong>Metoda płatności:</strong> {paymentMethodName}</Typography>
                     <Typography><strong>Data zakupu:</strong> {dayjs().format("L LTS")}</Typography>
                 </Box>
@@ -149,7 +172,7 @@ const ConfirmTicket = () => {
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         />
                         <Marker position={[coordinates.latitude, coordinates.longitude]}>
-                            <Popup>
+                            <Popup ref={popupRef}>
                                 {eventName} - {locationName}
                             </Popup>
                         </Marker>
