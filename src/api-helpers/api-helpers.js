@@ -554,7 +554,40 @@ export const getUserOrders = async (iduser) => {
     console.error(e.message);
   }
 }
-
+export const getEventDetailed = async (idevent) => {
+  try{
+    const token = sessionStorage.getItem('token');
+    console.log("getuserorders");
+    console.log(token);
+    if(token == null){
+      return [];
+    }
+    console.log("asking for specific order");
+    console.log(idevent);
+    const res = await axios.get(`/api/events/readDetails/${idevent}`, {
+      headers: {
+        'authorization': `Bearer ${token}`
+      }
+    });
+    if(res.status === 200){
+      console.log("got event detailed");
+      console.log(res.data.event)
+      return res.data.event;
+    }else if(res.status === 403){
+      console.error("Access denied");
+      return [];
+    }else if(res.status === 404){
+      console.error("Not found");
+      return [];
+    }else{
+      console.error("Error fetching comments:", res.data.msg);
+        return [];
+    }
+    
+  }catch(e){
+    console.error(e.message);
+  }
+}
 export const getUserOrder = async (idorder) => {
   try{
     const token = sessionStorage.getItem('token');

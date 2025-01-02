@@ -66,7 +66,7 @@ const [user_types, setUserTypes] = useState([]);
   return (
     <section>
       <dl className="collumn">
-        <dt className="col-sm-2">iduser</dt>
+        <dt className="col-sm-2">ID użytkownika</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -80,7 +80,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">name</dt>
+        <dt className="col-sm-2">Imię</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -95,7 +95,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">second_name</dt>
+        <dt className="col-sm-2">Drugie imię</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -110,7 +110,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">surname</dt>
+        <dt className="col-sm-2">Nazwisko</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -140,7 +140,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd> */}
 
-        <dt className="col-sm-2">usertype</dt>
+        <dt className="col-sm-2">Typ użytkownika</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <select
@@ -165,7 +165,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">email</dt>
+        <dt className="col-sm-2">Adres email</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -180,7 +180,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">phonenumber</dt>
+        <dt className="col-sm-2">Numer telefonu</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -195,7 +195,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">zipcode</dt>
+        <dt className="col-sm-2">Kod pocztowy</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -210,7 +210,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">street</dt>
+        <dt className="col-sm-2">Ulica</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
@@ -249,7 +249,7 @@ const [user_types, setUserTypes] = useState([]);
             </select>
           </div>
         </dd> */}
-         <dt className="col-sm-2">city</dt>
+         <dt className="col-sm-2">Miasto</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <select
@@ -264,7 +264,7 @@ const [user_types, setUserTypes] = useState([]);
                 });
               }}
             >
-              <option value="" disabled>Select a city</option>
+              <option value="" disabled>Wybierz miasto</option>
               {Object.keys(groupedCities).map((country) => (
                 <optgroup key={country} label={country}>
                   {groupedCities[country].map((city) => (
@@ -278,7 +278,7 @@ const [user_types, setUserTypes] = useState([]);
           </div>
         </dd>
 
-        <dt className="col-sm-2">password</dt>
+        <dt className="col-sm-2">Hasło</dt>
         <dd className="col-sm-10">
           <div className="input-group mb-3">
             <input
