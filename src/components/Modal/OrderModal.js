@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Box, Typography, Button } from "@mui/material";
 import style from "./modalStyle";
+// import { handleDownloadQR, handleDownloadPDF } from '../../api-helpers/api-helpers';
 
 const OrderModal = ({ open, onClose, order }) => {
   return (
@@ -27,7 +28,8 @@ const OrderModal = ({ open, onClose, order }) => {
               </tr>
             </thead>
             <tbody>
-              {order && order.order_tickets ? order.order_tickets.map((ticket) => (
+              {order && order.order_tickets
+                ? order.order_tickets.map((ticket) => (
                     <tr key={ticket.idorder_ticket}>
                       <td>{ticket.idorder_ticket}</td>
                       <td>{ticket.event_ticket.event.name}</td>
@@ -36,7 +38,20 @@ const OrderModal = ({ open, onClose, order }) => {
                       <td>{ticket.event_ticket.price} zł</td>
                       <td>{ticket.ticket_status}</td>
                       <td>
-                        <Button>Pobierz bilet</Button>
+                        {/* <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={ () => handleDownloadPDF(order)}
+                        >
+                          Pobierz PDF
+                        </Button> */}
+                        {/* <Button
+                          variant="contained"
+                          color="secondary"
+                          onClick={ () => handleDownloadQR(ticket.event_ticket.event.name)}
+                        >
+                          Pobierz Kod QR
+                        </Button> */}
                       </td>
                     </tr>
                   ))

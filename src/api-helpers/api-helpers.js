@@ -1,4 +1,6 @@
 import axios from 'axios';
+import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
+
 const getAuthToken = () => {
     return localStorage.getItem("token"); // Zakładamy, że token jest przechowywany w localStorage
 };
@@ -467,7 +469,7 @@ export const updateUser = async (user) => {
           }
         });
         console.log(res);
-        if (res && res.status === 201) {
+        if (res && res.status === 200) {
             return true; 
         } else {
             console.error("Error updating user res:");
@@ -659,4 +661,84 @@ export const printPrice = async (price) => {
       servicePrice: servicePrice,
       basePrice: price,
   };
+};
+
+
+export const handleDownloadPDF = (order) => {
+  
+  const {
+    order_tickets,
+    total_amount,
+    total_tax_amount,
+  } = order;
+
+  // Zakładam, że dane o wydarzeniu i bilecie są w order_tickets
+  const orderDetails = order_tickets.map((ticket) => {
+    const { event_ticket, ticket_status } = ticket;
+    const {
+      name: eventName,
+      start_date,
+      end_date,
+      location_name,
+      price,
+    } = event_ticket;
+
+    // Przygotowanie szczegółów biletu w HTML
+    return `
+      <div>
+        <h2>Bilet na Wydarzenie</h2>
+        <h3>Szczegóły wydarzenia:</h3>
+        <p><strong>Wydarzenie:</strong> ${eventName}</p>
+        <p><strong>Data rozpoczęcia:</strong> ${new Date(start_date).toLocaleDateString()}</p>
+        <p><strong>Data zakończenia:</strong> ${new Date(end_date).toLocaleDateString()}</p>
+        <p><strong>Lokalizacja:</strong> ${location_name}</p>
+        <p><strong>Podział miejsc:</strong> ${ticket_status === "purchased" ? "Tak" : "Nie"}</p>
+        <p><strong>Kategoria:</strong> Trzecia Kategoria</p>
+        <p><strong>Cena za sztukę:</strong> ${price} zł</p>
+        <p><strong>Ilość:</strong> 1</p>
+        <p><strong>Cena opłaty serwisowej:</strong> 5.25 zł</p>
+        <p><strong>Łączna cena z opłatą serwisową:</strong> ${total_amount} zł</p>
+        <p><strong>Metoda płatności:</strong> </p>
+      </div>
+    `;
+  }).join('');
+
+  const totalPrice = `
+    <div>
+      <h3>Szczegóły płatności:</h3>
+      <p><strong>Łączna cena:</strong> ${total_amount} zł</p>
+      <p><strong>Łączna kwota z podatkiem:</strong> ${total_tax_amount} zł</p>
+    </div>
+  `;
+
+  const pdfContent = `
+    <div style="font-family: Arial, sans-serif; font-size: 14px;">
+      ${orderDetails}
+      ${totalPrice}
+      <div>
+        <p><strong>Data zakupu:</strong> ${new Date().toLocaleString()}</p>
+      </div>
+      <!-- QR Code i Mapa - te elementy trzeba będzie dodać dynamicznie -->
+      <div>
+        <p><strong>Kod QR:</strong></p>
+        <img src="data:image/png;base64,...your-qrcode-base64..." alt="QR Code" style="max-width: 200px;"/>
+      </div>
+      <div>
+        <p><strong>Mapa lokalizacji wydarzenia:</strong></p>
+        <!-- Tutaj trzeba dodać obraz mapy lub iframe -->
+        <img src="data:image/png;base64,...your-map-image-base64..." alt="Map" style="max-width: 100%;"/>
+      </div>
+    </div>
+  `;
+
+  // Tworzymy tymczasowy element HTML
+  const element = document.createElement('div');
+  element.innerHTML = pdfContent;
+  document.body.appendChild(element);
+
+  // Generowanie PDF z HTML
+  html2pdf().from(element).save('ticket_details.pdf');
+
+  // Usuwamy tymczasowy element po generowaniu PDF
+  document.body.removeChild(element);
 };

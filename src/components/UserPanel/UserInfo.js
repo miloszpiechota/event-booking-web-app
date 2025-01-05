@@ -8,12 +8,15 @@ import {
 
 const UserInfo = () => {
   const [user, setUser] = useState(null);
-  const [tempUser, setTempUser] = useState({ ...user });
+  const [tempUser, setTempUser] = useState(null);
+  
+  // const [tempUser, setTempUser] = useState({ ...user });
 
   const [cities, setCities] = useState([]);
   const [isEditable, setIsEditable] = useState(false);
   const [user_types, setUserTypes] = useState([]);
   const fetchUserTypesData = async () => {
+    
     try {
       const [userTypes] = await Promise.all([getUserTypes()]);
       console.log(userTypes);
@@ -34,52 +37,57 @@ const UserInfo = () => {
     try {
       const iduser = sessionStorage.getItem("iduser");
       const [userData] = await Promise.all([getUserInfo(iduser)]);
+      console.log("fetched user data ", userData);
 
-      setUser(userData);
-      setTempUser(userData);
+      await setTempUser(userData);
 
+      await setUser(userData);
+
+      console.log("User:", user);
+      console.log("TempUser:", tempUser);
     } catch (error) {
       console.error(error.message);
     }
   };
-  // Funkcja wywołująca aktualizację danych (przykład)
-const handleUpdate = () => {
-  console.log(tempUser);
-  if(updateUser(tempUser)){
-    fetchUserData();
-  }
-  toggleEditMode();
-};
+  const handleUpdate = async () => {
+    try {
+      await updateUser(tempUser); // Aktualizacja danych użytkownika na serwerze
+      window.location.reload(); // Odświeżenie strony
+    } catch (error) {
+      console.error("Błąd podczas aktualizacji danych użytkownika:", error);
+    }
+  };
   useEffect(() => {
-    
     fetchCitiesData();
     fetchUserTypesData();
     fetchUserData();
   }, []);
-  if (!user) {
-    // Jeżeli dane jeszcze nie zostały załadowane
-    return <div>Loading...</div>;
-  }
+  
+  
 
   // Funkcja do obsługi przycisku, który przełącza tryb edycji
   const toggleEditMode = () => {
     if (isEditable) {
-      // Jeśli wychodzimy z trybu edycji, przywróć oryginalne dane
       setTempUser({ ...user });
     }
     setIsEditable((prev) => !prev); // Zmiana trybu edycji
   };
 
-  
   const groupedCities = cities.reduce((acc, city) => {
-    const countryName = city.country.name_country; // Pobieramy nazwę kraju z obiektu country
+    const countryName = city.country.name_country; 
     if (!acc[countryName]) {
       acc[countryName] = [];
     }
     acc[countryName].push(city);
     return acc;
   }, {});
-
+  
+  useEffect(() => {}, [user]);
+  useEffect(() => {}, [tempUser]);
+  if (!user) {
+    // Jeżeli dane jeszcze nie zostały załadowane
+    return <div>Loading...</div>;
+  }
   return (
     <section>
       <dl className="collumn">
