@@ -451,7 +451,36 @@ export const createEventLocation = async (locationData) => {
     throw error;
   }
 };
+// Funkcja do aktualizacji użytkownika
+export const updateUser = async (user) => {
+  try {
+    const token = sessionStorage.getItem('token');
+    
+    if(token == null){
+      return [];
+    }
+  
+    console.log("user", user);
+        const res = await axios.put(`/api/users/update/${user.iduser}`, user, {
+          headers: {
+            'authorization': `Bearer ${token}`
+          }
+        });
+        console.log(res);
+        if (res && res.status === 201) {
+            return true; 
+        } else {
+            console.error("Error updating user res:");
+            // console.error("Error updating user res:", res.data.error);
 
+            return null;
+        }
+    } catch (error) {
+        console.error("Error updating user error:", error);
+        return null;
+    }
+};
+ 
 export const getUserInfo = async (iduser) => {
   try{
     const token = sessionStorage.getItem('token');

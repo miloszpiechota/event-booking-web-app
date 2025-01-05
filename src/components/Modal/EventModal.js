@@ -1,53 +1,3 @@
-// import React from "react";
-// import { Modal, Box, Typography } from "@mui/material";
-// import style from "./modalStyle";
-// import { format } from "date-fns";
-// import { pl } from "date-fns/locale";
-// const EventModal = ({ open, onClose, event }) => {
-//   return (
-//     <Modal
-//       open={open}
-//       onClose={onClose}
-//       aria-labelledby="modal-event-title"
-//       aria-describedby="modal-event-description"
-//     >
-//       <Box sx={style}>
-//         <Typography id="modal-event-title" variant="h6" component="h2">
-//           Szczegóły wydarzenia: {event ? event.name : "Ładowanie..."}
-//         </Typography>
-//         <Typography id="modal-event-description" sx={{ mt: 2 }}>
-//           {event && event.event_location ? (
-//             <div>
-//               <p>Nazwa wydarzenia: {event.name}</p>
-//               <p>Lokalizacja: {event.event_location.name}</p>
-//               <p>
-//                 Data rozpoczęcia:
-//                 {event && event.start_date
-//                   ? format(new Date(event.start_date), "dd MMMM yyyy, HH:mm", {
-//                       locale: pl,
-//                     })
-//                   : "Błędna data"}
-//               </p>
-//               <p>
-//                 Data zakończenia:{" "}
-//                 {event && event.end_date
-//                   ? format(new Date(event.end_date), "dd MMMM yyyy, HH:mm", {
-//                       locale: pl,
-//                     })
-//                   : "Błędna data"}
-//               </p>
-//             </div>
-//             //tu możesz dodać to okno
-//           ) : (
-//             "Ładowanie..."
-//           )}
-//         </Typography>
-//       </Box>
-//     </Modal>
-//   );
-// };
-
-// export default EventModal;
 import React from "react";
 import { Modal, Box, Typography, Grid, Button, Paper } from "@mui/material";
 import { format } from "date-fns";
@@ -129,7 +79,7 @@ const EventModal = ({ open, onClose, event, comments }) => {
               border: "1px solid #ddd",
             }}
           >
-            {event.comments && event.comments.length > 0 ? (
+            {event && event.comments && event.comments.length > 0 ? (
               event.comments.map((comment, index) => (
                 <TableRow key={index}>
                   <TableCell>{comment.iduser}</TableCell>
@@ -252,6 +202,56 @@ export default EventModal;
 //                 </TableContainer>
 //               </Box>
 //             </div>
+//           ) : (
+//             "Ładowanie..."
+//           )}
+//         </Typography>
+//       </Box>
+//     </Modal>
+//   );
+// };
+
+// export default EventModal;
+// import React from "react";
+// import { Modal, Box, Typography } from "@mui/material";
+// import style from "./modalStyle";
+// import { format } from "date-fns";
+// import { pl } from "date-fns/locale";
+// const EventModal = ({ open, onClose, event }) => {
+//   return (
+//     <Modal
+//       open={open}
+//       onClose={onClose}
+//       aria-labelledby="modal-event-title"
+//       aria-describedby="modal-event-description"
+//     >
+//       <Box sx={style}>
+//         <Typography id="modal-event-title" variant="h6" component="h2">
+//           Szczegóły wydarzenia: {event ? event.name : "Ładowanie..."}
+//         </Typography>
+//         <Typography id="modal-event-description" sx={{ mt: 2 }}>
+//           {event && event.event_location ? (
+//             <div>
+//               <p>Nazwa wydarzenia: {event.name}</p>
+//               <p>Lokalizacja: {event.event_location.name}</p>
+//               <p>
+//                 Data rozpoczęcia:
+//                 {event && event.start_date
+//                   ? format(new Date(event.start_date), "dd MMMM yyyy, HH:mm", {
+//                       locale: pl,
+//                     })
+//                   : "Błędna data"}
+//               </p>
+//               <p>
+//                 Data zakończenia:{" "}
+//                 {event && event.end_date
+//                   ? format(new Date(event.end_date), "dd MMMM yyyy, HH:mm", {
+//                       locale: pl,
+//                     })
+//                   : "Błędna data"}
+//               </p>
+//             </div>
+//             //tu możesz dodać to okno
 //           ) : (
 //             "Ładowanie..."
 //           )}
