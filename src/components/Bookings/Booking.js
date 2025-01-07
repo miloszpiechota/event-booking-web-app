@@ -367,7 +367,7 @@ const Booking = () => {
               sx={{ bgcolor: "#4A79D9" }}
               onClick={handleSubmit(onSubmit)}
             >
-              Next (Confirm)
+              Next 
             </Button>
           </Box>
         </>

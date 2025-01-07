@@ -10,6 +10,8 @@ import {
   InputLabel,
   FormControl,
   FormHelperText,
+  Box, // Import Box for better layout control
+  Typography, // Import Typography for headings
 } from "@mui/material";
 
 // Define the schema for form validation
@@ -82,8 +84,20 @@ const UserRegistration = () => {
   };
 
   return (
-    <div>
-      <h2>User Registration</h2>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', bgcolor: '#ffffff' }}>
+      <Box sx={{ width: { xs: '90%', md: '50%', lg: '40%' } }}> {/* Responsive width */}
+        <Box
+          sx={{
+            bgcolor: 'linear-gradient(to top, #4A79D9, #5C8BD9)',
+            borderRadius: '1rem',
+            p: 5, // Consistent padding
+            textAlign: 'center',
+            color: 'white',
+          }}
+        >
+          <Typography variant="h5" component="h2" gutterBottom> {/* Using Typography component */}
+            User Registration
+          </Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           control={control}
@@ -227,8 +241,10 @@ const UserRegistration = () => {
         <Button type="submit" variant="contained" color="primary" fullWidth>
           Sign Up
         </Button>
-      </form>
-    </div>
+        </form>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

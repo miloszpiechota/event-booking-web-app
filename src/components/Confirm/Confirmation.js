@@ -21,6 +21,8 @@ const Confirmation = () => {
     price,
     locationName,
     is_seat_categorized,
+    paymentMethodName,
+
   } = location.state || {};
 
   const [ticketPrices, setTicketPrices] = useState(null);
@@ -47,6 +49,8 @@ const Confirmation = () => {
         price,
         locationName,
         is_seat_categorized,
+        paymentMethodName,
+
       },
     });
     };
@@ -82,11 +86,11 @@ const Confirmation = () => {
                   <>
                     <Typography>
                       <strong>Cena opłaty serwisowej:</strong>{" "}
-                      {ticketPrices.servicePrice * quantity} zł
+                      {ticketPrices.servicePrice} zł
                     </Typography>
                     <Typography>
                       <strong>Łączna cena z opłatą serwisową:</strong>{" "}
-                      {ticketPrices.withServicePrice * quantity} zł
+                      {ticketPrices.basePrice * quantity + ticketPrices.servicePrice} zł
                     </Typography>
                   </>
                 )}
@@ -98,11 +102,11 @@ const Confirmation = () => {
                   <>
                     <Typography>
                       <strong>Cena opłaty serwisowej:</strong>{" "}
-                      {ticketPrices.servicePrice * quantity} zł
+                      {ticketPrices.servicePrice} zł
                     </Typography>
                     <Typography>
                       <strong>Łączna cena z opłatą serwisową:</strong>{" "}
-                      {ticketPrices.withServicePrice * quantity} zł
+                      {ticketPrices.basePrice * quantity + ticketPrices.servicePrice} zł
                     </Typography>
                   </>
                 )}

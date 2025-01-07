@@ -125,10 +125,7 @@ const ConfirmTicket =  () => {
             document.body.removeChild(downloadLink);
         }
     };
-
- 
     
-
     return (
         <Box padding={5} border="1px solid #ccc" borderRadius={4} maxWidth="600px" margin="auto">
             <Box id="ticket">
@@ -163,6 +160,7 @@ const ConfirmTicket =  () => {
                 <Box textAlign="center" marginTop={3}>
                     <QRCodeCanvas id="qrcode" value={qrCodeData} size={150} />
                 </Box>
+                </Box>
                 <Box marginTop={4}>
                 <Typography variant="h6" gutterBottom>Mapa lokalizacji wydarzenia:</Typography>
                 {coordinates ? (
@@ -181,7 +179,7 @@ const ConfirmTicket =  () => {
                 ) : (
                     <Typography>Ładowanie lokalizacji wydarzenia...</Typography>
                 )}
-            </Box>
+            
             </Box>
             <Box display="flex" justifyContent="center" gap={2} marginTop={4}>
                 <Button variant="contained" color="primary" onClick={handleDownloadPDF}>
