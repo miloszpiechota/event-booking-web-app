@@ -663,4 +663,18 @@ export const printPrice = async (price) => {
   };
 };
 
-
+export const createTicketOrder = async (orderData) => {
+  try {
+    const response = await axios.post("/api/orders/", orderData);
+    if (response.status === 201) {
+      console.log("Order created successfully:", response.data);
+      return { success: true, data: response.data };
+    } else {
+      console.error("Failed to create order:", response.data);
+      return { success: false, error: response.data };
+    }
+  } catch (error) {
+    console.error("Error creating order:", error);
+    return { success: false, error: error.message };
+  }
+};
